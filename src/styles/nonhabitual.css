@@ -1,0 +1,22 @@
+.pageLayout {
+    background-color: #F5EBE0;
+    
+    min-width: 100vh;
+  }
+  h1 {
+    color: #555B6E;
+  }
+  #date{
+    align-content : right;
+  }
+  .boxtitle{
+    background-color : #FFFFFF;
+    border-radius : 10px;
+  }
+  .boxactivity{
+    background-color : #D5BDAF;
+    border-radius : 10px;
+  }
+  .textheader{
+    
+  }
