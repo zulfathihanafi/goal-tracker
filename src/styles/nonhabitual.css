@@ -4,6 +4,7 @@
   padding-right: 200px;
   padding-top: 30px;
   padding-bottom: 200px;
+  min-height: 100vh;
 }
 
 .pageLayout button:hover{
@@ -28,4 +29,13 @@ h1 {
 }
 .textheader{
   font-family: 'Times New Roman', Times, serif
+}
+
+.progress{
+  font-size: 20px; 
+}
+
+.test{
+  padding-right: 50%;
+  padding-left: 50%;
 }

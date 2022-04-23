@@ -10,7 +10,7 @@ function test(para){
 }
 
 function buttonColour(path,currentRoute){
-    let color = path == "/" + currentRoute ? 'red' : 'black'
+    let color = path == "/" + currentRoute ? 'red' : 'none'
     return color
 }
 
