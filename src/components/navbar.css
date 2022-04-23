@@ -1,3 +1,14 @@
 .navigation {
-    color: brown;
+    position: sticky;
+    top: 0px;
+    z-index: 1110;
+}
+
+.navigation button{
+    margin: 5px;
+    color: white;
+    text-transform: uppercase;
+}
+.navigation button:hover{
+    background-color: red;
 }

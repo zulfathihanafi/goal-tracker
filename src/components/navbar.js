@@ -1,11 +1,26 @@
 import "./navbar.css"
 
 import {
-    Link
+    Link, useParams
 } from 'react-router-dom';
+import React from "react";
+
+function test(para){
+    console.log(para)
+}
+
+function buttonColour(path,currentRoute){
+    let color = path == "/" + currentRoute ? 'red' : 'black'
+    return color
+}
 
 const Navbar = () => {
+    let [color,setColor] = React.useState('none');
+    const pathname = window. location. pathname
+    const routes = ['goal','register','home','login']
+    test(buttonColour(pathname,"register"));
     return (
+        
         <div class="navigation">
             <nav class="navbar navbar-expand-lg  sticky-lg-top navbar-dark bg-dark">
 
@@ -16,14 +31,12 @@ const Navbar = () => {
                     </button>
                     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div class="navbar-nav">
-                            <Link to="/">
-                                <button> Test</button>
+                            {routes.map((route)=>(
+                                <Link to={route}>
+                                <button type="button" class="btn">{route}</button>
                             </Link>
-                            <Link to="/register">
-                                <button type="button" class="btn btn-primary">Primary</button>
-                            </Link>
-                            <a class="nav-link" href="#">Pricing</a>
-
+                            ))}
+                            
                         </div>
                     </div>
                 </div>

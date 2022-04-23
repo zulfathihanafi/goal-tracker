@@ -77,7 +77,7 @@ const Home = () => {
                     <Grid item xs={12} md={1}>
                         <Item style={{ boxShadow: 0 }} sx={{ border: 0, boxShadow: 0 }}>
                             <div>
-                                <Fab color="success" aria-label="add" onClick={handleClickOpen} size="medium">
+                                <Fab color="success" aria-label="add" onClick={handleClickOpen} size="medium" style={{'z-index':'5'}}>
                                     <AddIcon />
                                 </Fab>
                                 <Dialog open={open} onClose={handleClose} fullWidth="xl">

@@ -1,22 +1,31 @@
 .pageLayout {
-    background-color: #F5EBE0;
-    
-    min-width: 100vh;
-  }
-  h1 {
-    color: #555B6E;
-  }
-  #date{
-    align-content : right;
-  }
-  .boxtitle{
-    background-color : #FFFFFF;
-    border-radius : 10px;
-  }
-  .boxactivity{
-    background-color : #D5BDAF;
-    border-radius : 10px;
-  }
-  .textheader{
-    
-  }
+  background-color: #F5EBE0;
+  padding-left: 200px;
+  padding-right: 200px;
+  padding-top: 30px;
+  padding-bottom: 200px;
+}
+
+.pageLayout button:hover{
+  background-color: #b6b0a9;
+}
+
+h1 {
+  color: #555B6E;
+}
+#date{
+  align-content : right;
+}
+.boxtitle{
+  background-color : #FFFFFF;
+  border-radius : 10px;
+}
+.boxactivity{
+  margin-top: 20px;
+  background-color : #D5BDAF;
+  border-radius : 10px;
+  padding: 10px;
+}
+.textheader{
+  font-family: 'Times New Roman', Times, serif
+}
