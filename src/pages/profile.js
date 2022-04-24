@@ -1,6 +1,4 @@
 import "../styles/profile.css"
-import { EditText, EditTextarea } from 'react-edit-text';
-import 'react-edit-text/dist/index.css';
 import React from "react";
 import { Input } from "@mui/material";
 import { mentee } from "../data/user";
