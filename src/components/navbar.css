@@ -1,3 +1,4 @@
+
 .navigation {
     position: sticky;
     top: 0px;
@@ -6,9 +7,13 @@
 
 .navigation button{
     margin: 5px;
-    color: white;
+    background-color: #bac2ab;
+    color: #4d6753;
+    font-weight: bold;
     text-transform: uppercase;
 }
 .navigation button:hover{
-    background-color: red;
+    background-color: #4d6753;
+    color: white;
 }
+

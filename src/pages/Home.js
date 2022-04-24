@@ -8,6 +8,7 @@ import Paper from '@mui/material/Paper';
 import PropTypes from 'prop-types';
 import CircularProgress from '@mui/material/CircularProgress';
 import LinearProgress from '@mui/material/LinearProgress';
+import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import Box from '@mui/material/Box';
 import Backdrop from '@mui/material/Backdrop';
 import SpeedDial from '@mui/material/SpeedDial';
@@ -35,7 +36,14 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Divider from '@mui/material/Divider';
-
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Link } from 'react-router-dom';
+import '../styles/home.css'
+import { work, financial } from "../data/goals";
+import AddTaskIcon from '@mui/icons-material/AddTask';
+import Input from '@mui/material/Input';
+import { Navigate, useNavigate } from 'react-router-dom'
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
@@ -52,41 +60,92 @@ const actions = [
 ];
 
 const Home = () => {
-    const [goals,setGoals] = React.useState([[20, "red"], [50, "yellow"], [90, 'green'], [20, "red"], [90, 'green']]);
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClickOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
-    function addGoal(){
-        goals.unshift([20,'blue'])
-        console.log(goals)
-        setOpen(false)
-        
+    const [newWorkGoal, setNewWorkGoal] = React.useState({
+        title: "",
+        percentage: 0,
+        dueDate: '',
+        pendingTasks: [{ task: '', due: '' }],
+        finishedTasks: []
+    })
+    const [newFinanceGoal, setNewFinanceGoal] = React.useState({
+        title: "",
+        target: 0,
+        current: 0,
+        percentage: 0,
+        dueDate: '',
+        transactions: [
+            { details: '', amount: 0, type: '', date: "" }]
+    })
+    const [openFinance, setOpenFinance] = React.useState(false);
+    const [openWork, setOpenWork] = React.useState(false);
+    const [workDrop, setWorkDrop] = React.useState(true)
+    const [financialDrop, setFinancialDrop] = React.useState(true)
+    const [newTask, setNewTask] = React.useState([])
+    let navigate = useNavigate()
+    function addTasks() {
+
+    }
+
+    function addWorkGoal() {
+        setOpenWork(false)
+        navigate(`/goal/0`)
+        alert("Please add your task in the goal page.")
+        var currentWork = work
+        currentWork.unshift(newWorkGoal)
+        work = currentWork
+        console.log(work)
+
+
+        setNewWorkGoal({
+            title: "",
+            percentage: 0,
+            dueDate: '',
+            pendingTasks: [{ task: '', due: '' }],
+            finishedTasks: []
+        })
+
+    }
+    function addFinanceGoal() {
+        setOpenFinance(false)
+        navigate(`/goal3/0`)
+        alert("Please add your transaction in the goal page.")
+        var currentWork = financial
+        currentWork.unshift(newFinanceGoal)
+        financial = currentWork
+        console.log(work)
+
+
+        setNewFinanceGoal({
+            title: "",
+            target: 0,
+            current: 0,
+            percentage: 0,
+            dueDate: '',
+            transactions: [
+                { details: '', amount: 0, type: '', date: "" }]
+        })
     }
     return (
 
-        <div class="container">
+        <div class="container home">
+
             <Grid container spacing={2} justifyContent="flex-start" alignItems="center" style={{ marginTop: "10px" }}>
-                <Grid item xs={12}>
-                    <Item style={{ boxShadow: 0 }} sx={{ border: 0, boxShadow: 0 }}>
-                        <Typography variant="h2" style={{ marginBottom: "0px", textAlign: "center", color: "black" }}>My Goals</Typography>
-                    </Item>
-                </Grid>
-            </Grid>
-            <Grid container spacing={2} justifyContent="flex-start" alignItems="center" style={{ marginTop: "10px" }}>
-                <Grid item xs={12} md={11}>
-                    <Item style={{ boxShadow: 0 }} sx={{ border: 0, boxShadow: 0 }}>
-                        <Typography variant="h4" style={{ marginTop: "0px", marginBottom: "30px", textAlign: "left", color: "black" }}>Habitual Goals</Typography>
+                <Grid item xs={12} md={11} >
+                    <Item style={{ boxShadow: 0, backgroundColor: "#d9d9d9" }} sx={{ border: 0, boxShadow: 0 }}>
+
+                        <Typography onClick={e => { setWorkDrop(!workDrop) }} variant="h4" style={{ marginTop: "20px", marginBottom: "10px", textAlign: "left", color: "black", cursor: "pointer" }}>Work Goals
+                            <ArrowDropDownIcon style={{ marginLeft: "5px" }} />
+                        </Typography>
                     </Item>
                 </Grid>
                 <Grid item xs={12} md={1}>
-                    <Item style={{ boxShadow: 0 }} sx={{ border: 0, boxShadow: 0 }}>
+                    <Item style={{ boxShadow: 0, backgroundColor: "#d9d9d9" }} sx={{ border: 0, boxShadow: 0 }}>
                         <div>
-                            <Fab color="success" aria-label="add" onClick={handleClickOpen} size="medium" style={{ 'z-index': '5' }}>
+                            <Fab color="success" aria-label="add" onClick={e => { setOpenWork(true) }} size="medium" >
                                 <AddIcon />
                             </Fab>
-                            <Dialog open={open} onClose={handleClose} fullWidth="xl">
-                                <DialogTitle style={{ fontSize: "30px" }}>Add New Goal</DialogTitle>
+                            <Dialog open={openWork} onClose={e => { setOpenWork(false) }} fullWidth="xl">
+                                <DialogTitle style={{ fontSize: "30px" }}>Add New Work Goal</DialogTitle>
                                 <FormControl>
                                     <DialogContent>
                                         <DialogContentText style={{ fontWeight: 'bold' }}>
@@ -100,112 +159,103 @@ const Home = () => {
                                             type="title"
                                             fullWidth
                                             variant="standard"
+                                            onChange={e => { newWorkGoal.title = e.target.value }}
                                         />
-                                        <DialogContentText style={{ fontWeight: 'bold', marginTop: '15px' }}>
-                                            Description
-                                        </DialogContentText>
-                                        <TextField
-                                            autoFocus
-                                            margin="dense"
-                                            id="description"
-                                            label="Goal Description"
-                                            type="description"
-                                            fullWidth
-                                            variant="standard"
-                                        />
-                                        <DialogContentText style={{ fontWeight: 'bold', marginTop: '15px' }}>
-                                            Goal Type
-                                        </DialogContentText>
-                                        <RadioGroup
-                                            row
-                                            aria-labelledby="demo-row-radio-buttons-group-label"
-                                            name="row-radio-buttons-group"
-                                        >
-                                            <FormControlLabel value="type1" control={<Radio />} label="Type 1" />
-                                            <FormControlLabel value="type2" control={<Radio />} label="Type 2" />
-                                        </RadioGroup>
-                                        <DialogContentText style={{ fontWeight: 'bold', marginTop: '15px', marginBottom: "10px" }}>
+                                        
+                                        <DialogContentText style={{ fontWeight: 'bold', marginTop: '5px', marginBottom: "10px" }}>
                                             Goal Deadline
                                         </DialogContentText>
-                                        <input type="datetime-local" id="birthdaytime" name="birthdaytime"></input>
+                                        <input
+                                            type="date"
+                                            id="birthdaytime"
+                                            name="birthdaytime"
+                                            onChange={e => { newWorkGoal.dueDate = e.target.value }}>
+
+                                        </input>
+
                                     </DialogContent>
                                 </FormControl>
                                 <DialogActions>
-                                    <Button onClick={handleClose}>Cancel</Button>
-                                    <Button onClick={e => addGoal()}>Add</Button>
-                                    <Button onClick={e => addGoal()}>Add</Button>
+                                    <Button onClick={e => setOpenWork(false)}>Cancel</Button>
+                                    <Button onClick={e => addWorkGoal()}>Add</Button>
+
                                 </DialogActions>
                             </Dialog>
                         </div>
                     </Item>
                 </Grid>
             </Grid>
-            {goals.map((goal) => (
-                <Grid container spacing={3} >
-                    <Grid item xs={12} >
-                        <Item sx={{ height: '100%' }} style={{ padding:'20px'}}>
-                            <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}>Goal 1</Typography>
-                            <Divider style={{ marginBottom: '15px' }} />
-                            <Grid container spacing={3}>
-                                <Grid item xs={12} md={4}>
-                                    <Item sx={{ height: '100%' }} style={{backgroundColor:"#d9d9d9"}}>
-                                        <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Overall Status</Typography>
-                                        <Box sx={{ position: 'relative', display: 'inline-flex' }} style={{ marginTop: '20px' }}>
-                                            <CircularProgress style={{ 'position': 'absolute', 'color': '#fff' }} variant="determinate" size={100} thickness={7} value={100} />
-                                            <CircularProgress style={{ 'color': goal[1] }} variant="determinate" size={100} thickness={7} value={goal[0]} />
-                                            <Box
-                                                sx={{
-                                                    top: 0,
-                                                    left: 0,
-                                                    bottom: 0,
-                                                    right: 0,
-                                                    position: 'absolute',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center',
-                                                }}
-                                            >
-                                                <Typography variant="h6" component="div" color="text.secondary">
-                                                    {`${Math.round(goal[0])}%`}
-                                                </Typography>
+            <Divider style={{ marginBottom: '15px' }} />
+            {workDrop ? work.map((goal, index) => (
+                <Link to={`/goal/${index}`} class="link">
+                    <Grid container spacing={1} >
+                        <Grid item xs={12} >
+                            <Item sx={{ height: '100%' }} style={{ padding: '20px', backgroundColor: "#92eea8" }}>
+                                <div className="row">
+                                    <div className="col-8">
+                                        <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}>{goal.title}</Typography>
+                                    </div>
+                                    <div className="col-4">
+                                        <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}><CalendarMonthIcon fontSize="large" style={{ marginRight: '10px' }} />{goal.dueDate}</Typography>
+                                    </div>
+                                </div>
+                                <Divider style={{ marginBottom: '15px' }} />
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12} md={4}>
+                                        <Item sx={{ height: '100%' }} style={{ backgroundColor: "#d9d9d9" }}>
+                                            <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Overall Status</Typography>
+                                            <Box sx={{ position: 'relative', display: 'inline-flex' }} style={{ marginTop: '30px' }}>
+                                                <CircularProgress style={{ 'position': 'absolute', 'color': '#fff' }} variant="determinate" size={100} thickness={7} value={100} />
+                                                <CircularProgress style={{ 'color': 'blue' }} variant="determinate" size={100} thickness={7} value={goal.percentage} />
+                                                <Box
+                                                    sx={{
+                                                        top: 0,
+                                                        left: 0,
+                                                        bottom: 0,
+                                                        right: 0,
+                                                        position: 'absolute',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                    }}
+                                                >
+                                                    <Typography variant="h6" component="div" color="text.secondary">
+                                                        {`${Math.round(goal.percentage)}%`}
+                                                    </Typography>
+                                                </Box>
                                             </Box>
-                                        </Box>
-                                        <Typography>{goal[0]}% Completed</Typography>
-                                    </Item>
-                                </Grid>
-                                <Grid item xs={12} md={8}>
-                                    <Item sx={{ height: '100%' }} style={{backgroundColor:"#d9d9d9"}}>
-                                        <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Task Completion</Typography>
-                                        <Typography>Task 1</Typography>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', width: '80%', ml: '10%', mr: '10%' }}>
-                                            <Box sx={{ width: '100%', mr: 1 }}>
-                                                <LinearProgress variant="determinate" value="50" />
-                                            </Box>
-                                            <Box sx={{ minWidth: 35 }}>
-                                                <Typography variant="body2" color="text.secondary">50%</Typography>
-                                            </Box>
-                                        </Box>
-                                        <Typography>Task 2</Typography>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', width: '80%', ml: '10%', mr: '10%' }}>
-                                            <Box sx={{ width: '100%', mr: 1 }}>
-                                                <LinearProgress variant="determinate" value="80" />
-                                            </Box>
-                                            <Box sx={{ minWidth: 35 }}>
-                                                <Typography variant="body2" color="text.secondary">80%</Typography>
-                                            </Box>
-                                        </Box>
-                                        <Typography>Task 3</Typography>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', width: '80%', ml: '10%', mr: '10%' }}>
-                                            <Box sx={{ width: '100%', mr: 1 }}>
-                                                <LinearProgress variant="determinate" value="10" />
-                                            </Box>
-                                            <Box sx={{ minWidth: 35 }}>
-                                                <Typography variant="body2" color="text.secondary">10%</Typography>
-                                            </Box>
-                                        </Box>
-                                    </Item>
-                                </Grid>
-                                {/* <Grid item xs={12} md={12}>
+                                            <Typography>{goal.percentage}% Completed</Typography>
+                                        </Item>
+                                    </Grid>
+                                    <Grid item xs={12} md={8}>
+                                        <Item sx={{ height: '100%' }} style={{ backgroundColor: "#d9d9d9" }}>
+                                            <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px', marginRight: '20px' }}>To-do List <AddTaskIcon /></Typography>
+                                            <div style={{ margin: '5px 50px' }}>
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" class="col-1">#</th>
+                                                            <th scope="col" class="col-8">Task</th>
+                                                            <th scope="col" class="col-3">Due Date</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {goal.pendingTasks.map((activity, index) => (
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    {index + 1}
+                                                                </th>
+                                                                <td>{activity.task}</td>
+                                                                <td>{activity.due}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </Item>
+
+                                    </Grid>
+                                    {/* <Grid item xs={12} md={12}>
                                     <Item sx={{ height: '100%' }}>
                                         <h6 variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Description</h6>
                                         <p sx={{ textAlign: 'left', pl: '10px' }}>
@@ -216,14 +266,174 @@ const Home = () => {
                                         </p>
                                     </Item>
                                 </Grid> */}
-                            </Grid>
-                        </Item>
+                                </Grid>
+                            </Item>
 
+                        </Grid>
+
+                        <Divider variant="middle" style={{ margin: "30px" }} />
                     </Grid>
+                </Link>)) : <div ></div>}
+            <div></div>
+            <Grid container spacing={2} justifyContent="flex-start" alignItems="center" style={{ marginTop: "10px" }}>
+                <Grid item xs={12} md={11} >
+                    <Item style={{ boxShadow: 0, backgroundColor: "#d9d9d9" }} sx={{ border: 0, boxShadow: 0 }}>
 
-                    <Divider variant="middle" style={{ margin: "30px" }} />
-                </Grid>))}
-                
+                        <Typography onClick={e => { setFinancialDrop(!financialDrop) }} variant="h4" style={{ marginTop: "20px", marginBottom: "10px", textAlign: "left", color: "black", cursor: "pointer" }}>Financial Goals
+                            <ArrowDropDownIcon style={{ marginLeft: "5px" }} />
+                        </Typography>
+                    </Item>
+                </Grid>
+                <Grid item xs={12} md={1}>
+                    <Item style={{ boxShadow: 0, backgroundColor: "#d9d9d9" }} sx={{ border: 0, boxShadow: 0 }}>
+                        <div>
+                            <Fab color="success" aria-label="add" onClick={e => { setOpenFinance(true) }} size="medium" >
+                                <AddIcon />
+                            </Fab>
+                            <Dialog open={openFinance} onClose={e => { setOpenFinance(false) }} fullWidth="xl">
+                                <DialogTitle style={{ fontSize: "30px" }}>Add New Finance Goal</DialogTitle>
+                                <FormControl>
+                                    <DialogContent>
+                                        <DialogContentText style={{ fontWeight: 'bold' }}>
+                                            Title
+                                        </DialogContentText>
+                                        <TextField
+                                            autoFocus
+                                            margin="dense"
+                                            id="title"
+                                            label="Goal Title"
+                                            type="title"
+                                            fullWidth
+                                            variant="standard"
+                                            onChange={e => { newFinanceGoal.title = e.target.value}}
+                                        />
+                                        <DialogContentText style={{ fontWeight: 'bold' }}>
+                                            Target
+                                        </DialogContentText>
+                                        <TextField
+                                            autoFocus
+                                            margin="dense"
+                                            id="title"
+                                            label="Goal Target"
+                                            type="title"
+                                            fullWidth
+                                            variant="standard"
+                                            onChange={e => { newFinanceGoal.target = Number(e.target.value) }}
+                                        />
+                                        <DialogContentText style={{ fontWeight: 'bold', marginTop: '15px', marginBottom: "10px" }}>
+                                            Goal Deadline
+                                        </DialogContentText>
+                                        <input 
+                                        type="date" id="birthdaytime" 
+                                        name="birthdaytime"
+                                        onChange={e => { newFinanceGoal.dueDate = e.target.value }}></input>
+                                    </DialogContent>
+                                </FormControl>
+                                <DialogActions>
+                                    <Button onClick={e => setOpenFinance(false)}>Cancel</Button>
+                                    <Button onClick={e => addFinanceGoal()}>Add</Button>
+
+                                </DialogActions>
+                            </Dialog>
+                        </div>
+                    </Item>
+                </Grid>
+            </Grid>
+            <Divider style={{ marginBottom: '15px' }} />
+            {financialDrop ? financial.map((goal, index) => (
+                <Link to={`/goal3/${index}`} class="link">
+                    <Grid container spacing={1} >
+                        <Grid item xs={12} >
+                            <Item sx={{ height: '100%' }} style={{ padding: '20px', backgroundColor: "#fffd89" }}>
+                                <div className="row">
+                                    <div className="col-8">
+                                        <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}>{goal.title}</Typography>
+                                    </div>
+                                    <div className="col-4">
+                                        <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}><CalendarMonthIcon fontSize="large" style={{ marginRight: '10px' }} />{goal.dueDate}</Typography>
+                                    </div>
+                                </div>
+                                <Divider style={{ marginBottom: '15px' }} />
+                                <Grid container spacing={3}>
+                                    <Grid item xs={12} md={4}>
+                                        <Item sx={{ height: '100%' }} style={{ backgroundColor: "#d9d9d9" }}>
+                                            <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Overall Status</Typography>
+                                            <Box sx={{ position: 'relative', display: 'inline-flex' }} style={{ marginTop: '30px' }}>
+                                                <CircularProgress style={{ 'position': 'absolute', 'color': '#fff' }} variant="determinate" size={100} thickness={7} value={100} />
+                                                <CircularProgress style={{ 'color': "blue" }} variant="determinate" size={100} thickness={7} value={goal.percentage} />
+                                                <Box
+                                                    sx={{
+                                                        top: 0,
+                                                        left: 0,
+                                                        bottom: 0,
+                                                        right: 0,
+                                                        position: 'absolute',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                    }}
+                                                >
+                                                    <Typography variant="h6" component="div" color="text.secondary">
+                                                        {`${Math.round(goal.percentage)}%`}
+                                                    </Typography>
+                                                </Box>
+                                            </Box>
+                                            <Typography>{goal.percentage}% Completed</Typography>
+                                        </Item>
+                                    </Grid>
+                                    <Grid item xs={12} md={8}>
+                                        <Item sx={{ height: '100%' }} style={{ backgroundColor: "#d9d9d9" }}>
+                                            <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px', marginRight: '20px' }}>Recent Transaction <CurrencyExchangeIcon /></Typography>
+                                            <div style={{ margin: '5px 50px' }}>
+                                                <table class="table">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col" class="col-1">#</th>
+                                                            <th scope="col" class="col-8">Transaction</th>
+                                                            <th scope="col" class="col-3">Amount</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {goal.transactions.slice(0, 3).map((transaction, index) => (
+                                                            <tr>
+                                                                <th scope="row">
+                                                                    {index + 1}
+                                                                </th>
+                                                                <td>{transaction.details}</td>
+                                                                <td>{transaction.type == 'Credit' ?
+                                                                    <strong
+                                                                        style={{ color: 'green' }}
+                                                                    >+ {transaction.amount.toFixed(2)}</strong> :
+                                                                    <strong
+                                                                        style={{ color: 'red' }}
+                                                                    >- {transaction.amount.toFixed(2)}</strong>}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </Item>
+
+                                    </Grid>
+                                    {/* <Grid item xs={12} md={12}>
+                                    <Item sx={{ height: '100%' }}>
+                                        <h6 variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Description</h6>
+                                        <p sx={{ textAlign: 'left', pl: '10px' }}>
+                                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
+                                            blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur,
+                                            neque doloribus, cupiditate numquam dignissimos laborum fugiat deleniti? Eum
+                                            quasi quidem quibusdam.
+                                        </p>
+                                    </Item>
+                                </Grid> */}
+                                </Grid>
+                            </Item>
+
+                        </Grid>
+
+                        <Divider variant="middle" style={{ margin: "30px" }} />
+                    </Grid>
+                </Link>)) : <div ></div>}
         </div>
 
     )

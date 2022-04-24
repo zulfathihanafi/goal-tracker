@@ -1,24 +1,40 @@
+import { useState } from 'react';
 import '../styles/login.css'
-const Login = () => {
+
+
+const Login = ({user}) => {
+    const [loginUser,setLoginUser] = useState({email:'',password:''})
+    function login(){
+        let currentUser = loginUser
+        setLoginUser(currentUser)
+        if(loginUser.email == "k@gmail.com" && loginUser.password=="123456"){
+            user[1](loginUser)
+        }else{
+            alert("No profile found ! Please register first")
+        }
+
+    }
     return (
-        <div class="login">
-            <div class="login-form">
-                <form>
+        <div className="loginbody">
+            <header className="welcome">
+                <h1>Welcome Back!</h1>
+            </header>
+            <div className="login">
+
+                <div className="login-form">
                     <h1>Login</h1>
-                    <div class="content">
-                        <div class="input-field">
-                            <input type="email" placeholder="Email" autocomplete="nope" />
+                    <form>
+                        <label>Email</label>
+                        <input type="email" placeholder="Email" autocomplete="nope" onChange={e => loginUser.email = e.target.value} />
+                        <label>Password</label>
+                        <input type="password" placeholder="Password" autocomplete="new-password" onChange={e => loginUser.password = e.target.value} />
+                        <p>Forgot Your Password? Click <a href="#" class="link">Here</a> </p>
+                        <div>
+                            <button class="btn">Register</button>
+                            <input type="button" value="Log In" onClick={e => login()} />
                         </div>
-                        <div class="input-field">
-                            <input type="password" placeholder="Password" autocomplete="new-password" />
-                        </div> Forgot Your Password? Click
-                        <a href="#" class="link">Here</a>
-                    </div>
-                    <div class="action">
-                        <button>Register</button>
-                        <button>Sign in</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     );

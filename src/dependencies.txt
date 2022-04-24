@@ -1,0 +1,5 @@
+npm install react-edit-text --save
+bootstrap
+mui + mui icon
+react-bootstrap
+npm install moment --save 

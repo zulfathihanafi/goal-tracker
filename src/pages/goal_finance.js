@@ -31,18 +31,21 @@ import FormLabel from '@mui/material/FormLabel';
 import Divider from '@mui/material/Divider';
 import Grid from '@mui/material/Grid';
 import moment from 'moment';
-
-const Finance = () => {
-    const [transactions, setTransactions] = useState([{ details: 'February Income', amount: 20, type: 'Credit', date: "20 April 2020" },
-    { details: 'Emergency', amount: 15, type: 'Debit', date: "20 April 2020" },
-    { details: 'Mac Income', amount: 30, type: 'Credit', date: "20 April 2020" },
-    { details: 'April Income', amount: 40, type: 'Credit', date: "20 April 2020" }])
+import { useParams } from "react-router";
+import DropdownButton from 'react-bootstrap/DropdownButton'
+import Dropdown from 'react-bootstrap/Dropdown'
+import Input from '@mui/material/Input';
+import { Navigate, useNavigate } from 'react-router-dom'
+import MenuItem from '@mui/material/MenuItem';
+const Finance = ({ financial }) => {
+    const { id } = useParams();
+    var currentFinancialGoal = financial[id]
     const [newTransaction, setNewTransaction] = useState({
         details: '',
         amount: 0,
         type: 'Credit',
         date: moment().format('ll')
-        
+
     })
     const [open, setOpen] = React.useState(false);
     const handleOpen = () => setOpen(true);
@@ -50,10 +53,19 @@ const Finance = () => {
     const handleClose = () => setOpen(false);
     const [numbers, setNumber] = React.useState([])
     const [buttonAble, setButtonAble] = useState(false);
-    const [targetMoney, setTargetMoney] = useState(100.00)
-    const [currentMoney, setCurrentMoney] = useState(75.00)
+    const [targetMoney, setTargetMoney] = useState(currentFinancialGoal.target)
+    const [currentMoney, setCurrentMoney] = useState(currentFinancialGoal.current)
+    const [percentage, setPercentage] = useState(currentFinancialGoal.percentage)
+    const [editable, setEditable] = useState(false)
+    let navigate = useNavigate();
 
+    function deleteGoal() {
+        let currentFinance = financial
+        delete currentFinance[id]
 
+        financial = currentFinance
+        navigate('/home')
+    }
     function addArray(target, index) {
         if (target.checked) {
             numbers.push(index)
@@ -70,7 +82,12 @@ const Finance = () => {
         }
         console.log(numbers)
     }
-
+    useEffect(() => {
+        let newPercentage = Math.round((currentMoney / targetMoney) * 100)
+        console.log("new percentage" + newPercentage)
+        currentFinancialGoal.percentage = newPercentage;
+        setPercentage(newPercentage)
+    }, [currentMoney])
     const addTransactionDialog = (<Dialog open={open} onClose={handleClose} fullWidth="xl">
         <DialogTitle style={{ fontSize: "30px" }}>Add New Transaction</DialogTitle>
         <FormControl>
@@ -89,11 +106,7 @@ const Finance = () => {
                     fullWidth
                     variant="standard"
                     onChange={e => {
-
-
-                        
                         newTransaction.details = e.target.value
-
                     }}
                 />
                 <DialogContentText style={{ fontWeight: 'bold' }}>
@@ -111,9 +124,9 @@ const Finance = () => {
                         if (isNaN(e.target.value) == false) {
                             var number = e.target.value
                             newTransaction.amount = Number(number)
-                            
+
                         } else {
-                            
+
                             e.target.value = 0
                         }
                     }}
@@ -123,8 +136,8 @@ const Finance = () => {
                     <br></br>
 
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group" style={{ marginTop: '10px' }}>
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked 
-                        onClick = {e=>{newTransaction.type ="Credit"}}/>
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked
+                            onClick={e => { newTransaction.type = "Credit" }} />
                         <label class="btn btn-outline-primary" for="btnradio1">Credit</label>
 
                         <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" onClick={e => {
@@ -145,14 +158,18 @@ const Finance = () => {
     </Dialog>)
     function addTransaction(e) {
         console.log(newTransaction)
-        var currentTransactions = transactions
-        currentTransactions.unshift(newTransaction)
-        if(newTransaction.type == "Debit"){
+
+        currentFinancialGoal.transactions.unshift(newTransaction)
+        if (newTransaction.type == "Debit") {
             setCurrentMoney(currentMoney - newTransaction.amount)
-        }else{
+            currentFinancialGoal.current = currentMoney
+
+        } else {
             setCurrentMoney(currentMoney + newTransaction.amount)
+            currentFinancialGoal.current = currentMoney
         }
-        setTransactions(currentTransactions)
+        console.log('add trans')
+
 
         setNewTransaction({
             details: '',
@@ -160,7 +177,7 @@ const Finance = () => {
             type: 'Credit',
             date: moment().format('ll')
         })
-        
+
         handleClose()
     }
 
@@ -168,7 +185,7 @@ const Finance = () => {
         <div className="pageLayout">
             <div className="container">
                 <h1 className='boxtitle textheader' style={{ textAlign: 'center' }}>
-                    Tabung Kahwin
+                    {currentFinancialGoal.title}
                 </h1>
                 <br></br>
                 <div class="align-self-center" style={{ width: '100%' }}>
@@ -176,12 +193,30 @@ const Finance = () => {
                 </div>
 
                 <div class="progress" style={{ height: '32px' }}>
-                    <div class="progress-bar bg-success" role="progressbar" style={{ width: `${(currentMoney / targetMoney) * 100}%` }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">{0 + Math.round((currentMoney / targetMoney) * 100)}%</div>
+                    <div class="progress-bar bg-success" role="progressbar" style={{ width: `${Math.round((currentMoney / targetMoney) * 100)}%` }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">{0 + Math.round((currentMoney / targetMoney) * 100)}%</div>
                 </div>
 
 
 
                 <div className='boxactivity'>
+                    <div className="row">
+                        <div className="col align-content-end">
+
+                        </div>
+                        <div className="col d-flex justify-content-end" style={{ maxWidth: '150px', borderRadius: "5px" }}>
+                            <Dropdown>
+                                <Dropdown.Toggle variant="success" id="dropdown-basic">
+                                    ...
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    <Dropdown.Item onClick={e => { setEditable(!editable) }}>Edit</Dropdown.Item>
+                                    <Dropdown.Item style={{ color: 'red' }} onClick={e => { deleteGoal() }}>Delete</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+
+                        </div>
+                    </div>
                     <div class="row text-center">
                         <div class="col border-end ">
                             <h1>Target :</h1>
@@ -200,7 +235,7 @@ const Finance = () => {
                         </div>
                         <div class="col-4">
 
-                            <button className="btn btn-light" onClick={handleOpen}>Add Transaction</button>
+                            <button className="btn" onClick={handleOpen}>Add Transaction</button>
                             {addTransactionDialog}
 
                         </div>
@@ -218,7 +253,7 @@ const Finance = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {transactions.map((transaction, index) => (
+                            {!editable ? currentFinancialGoal.transactions.map((transaction, index) => (
                                 <tr>
                                     <th scope="row">
                                         {index + 1}
@@ -236,9 +271,43 @@ const Finance = () => {
                                     <td><strong>{transaction.type}</strong></td>
                                     <td>{transaction.date}</td>
                                 </tr>
+                            )) : currentFinancialGoal.transactions.map((transaction, index) => (
+                                <tr>
+                                    <th scope="row">
+                                        {index + 1}
+                                    </th>
+                                    <td>
+                                        <Input defaultValue={transaction.details} onChange={e => { transaction.details = e.target.value }} />
+                                    </td>
+                                    <td>
+                                        <Input defaultValue={transaction.amount} onChange={e => { transaction.amount = Number(e.target.value) }} />
+                                    </td>
+                                    <td><strong>
+                                        <TextField
+                                            id="outlined-select"
+                                            select
+                                            defaultValue ={transaction.type}
+                                            onChange={e=>{transaction.type = e.target.value}}
+                                            
+                                        >
+                                            
+                                                <MenuItem key="credit" value="Credit">
+                                                    Credit
+                                                </MenuItem>
+                                                <MenuItem key="debit" value="Debit">
+                                                    Debit
+                                                </MenuItem>
+                                            
+                                        </TextField>
+                                    </strong></td>
+                                    <td>{transaction.date}</td>
+                                </tr>
                             ))}
+                            
                         </tbody>
+
                     </table>
+                    {editable ? <input type="button" value="Save Goal" onClick={e => { setEditable(!editable) }} /> : <div></div>}
                 </div>
             </div>
         </div>
