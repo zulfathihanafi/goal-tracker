@@ -1,0 +1,24 @@
+
+nav{
+    background-color: #8c25ff;
+}
+
+.navigation {
+    position: sticky;
+    top: 0px;
+    z-index: 1110;
+    font-family: 'Nunito', sans-serif;
+}
+
+.navigation button{
+    margin: 5px;
+    background-color: #8c25ff;
+    color: #ffffff;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.navigation button:hover{
+    color: rgb(14, 0, 119);
+}
+

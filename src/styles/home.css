@@ -1,0 +1,14 @@
+
+
+.home{
+    min-height: 100vh;   
+    font-family: 'Nunito', sans-serif;
+}
+
+.homeBody{
+    background-color: #f7f6f6;
+}
+
+.link{
+    text-decoration: none;
+}

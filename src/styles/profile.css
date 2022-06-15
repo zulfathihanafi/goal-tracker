@@ -1,0 +1,133 @@
+body {
+    background-color: white;
+    font-family: "Roboto", sans-serif;
+}
+
+
+.box {
+    box-sizing: border-box;
+    width: 153px;
+    height: 153px;
+    border: 2px solid #3498db;
+    box-shadow: -3px -3px 7px grey;
+    border-radius: 50%;
+    background-color: white;
+    margin-top: 50px;
+    overflow: hidden;
+    transition: all 1s;
+}
+
+.box:hover {
+    width: 360px;
+    height: 600px;
+    border-radius: 5px;
+}
+
+.box img {
+    box-sizing: border-box;
+    width: 170px;
+    height: 170px;
+    border-radius: 50%;
+    margin: 0;
+    padding: 3px;
+    background-color: white;
+    overflow: hidden;
+    transition: all 1s;
+
+}
+
+.box:hover img {
+    width: 100px;
+    height: 100px;
+    margin: 20px 35%;
+}
+
+.box input[type="text"],
+.box input[type="email"],
+.box input[type="password"] {
+    display: block;
+    box-sizing: border-box;
+    margin-bottom: 30px;
+    padding: 4px;
+    width: 220px;
+    height: 32px;
+    border: none;
+    border-bottom: 1px solid #0082e6;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    transition: 0.2s ease;
+    background: none;
+}
+
+.box input[type="text"] {
+    margin-top: 25px;
+}
+
+.box input[type="text"]:focus,
+.box input[type="email"]:focus,
+.box input[type="password"]:focus {
+    border-bottom: 2px solid #3498db;
+    border-bottom-right-radius: 20px;
+    color: black;
+    transition: 0.2s ease;
+    background: white;
+    border-top: none;
+}
+
+
+.box button {
+    border: 1px solid #3498db;
+    background-color: white;
+    height: 30px;
+    width: 100px;
+    border-radius: 5px;
+    left: 0;
+    margin: 0px;
+    transition: all .3s;
+}
+.delete{
+    float: left;
+    margin: 10px 0 0 18.2%;
+    color:red;
+}
+.delete:hover {
+    transform: scale(1.1);
+    background-color: pink;
+}
+.done{
+    float: right;
+    margin:10px 18.2% 0 0;
+}
+.done:hover {
+    transform: scale(1.1);
+    background-color: aqua;
+}
+
+.box input[type="file"] {
+    display: none;
+}
+
+.box label {
+    box-sizing: border-box;
+    width: 40px;
+    height: 20px;
+    background-color: white;
+    color: black;
+    border: 1px solid #3498db;
+    padding: 4px;
+    border-radius: 10px;
+}
+
+.box label:hover {
+    background-color: aqua;
+    transform: scale(1.1);
+}
+
+.profile input[type="button"]:enabled:hover{
+    background-color: #0082e6;
+}
+
+.profile input[type="button"]:disabled{
+    background-color: #a2d2f7;
+}

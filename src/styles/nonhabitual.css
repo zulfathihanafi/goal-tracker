@@ -1,0 +1,35 @@
+.pageLayout {
+  background-color: #ffffff; 
+  font-family: 'Nunito', sans-serif;
+}
+
+h1 {
+  color: #555B6E;
+}
+#date{
+  align-content : right;
+}
+.boxtitle{
+  background-color : #FFFFFF;
+  border-radius : 10px;
+  padding: 10px;
+}
+.boxactivity{
+  margin-top: 20px;
+  background-color : #ffffff;
+  border-radius : 10px;
+  padding: 10px;
+}
+.textheader{
+  font-family: "Roboto", sans-serif;
+}
+
+.progress{
+  font-size: 20px; 
+}
+
+.test{
+  padding-right: 50%;
+  padding-left: 50%;
+}
+
