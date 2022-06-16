@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
+import { UserContext } from '../userContext'
 import { useParams } from "react-router-dom"
 import '../styles/nonhabitual.css'
 import TextField from '@mui/material/TextField';
@@ -21,6 +22,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Box from '@mui/material/Box';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { auth, db } from "../components/firebase";
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -33,14 +35,57 @@ const Item = styled(Paper)(({ theme }) => ({
 const Nonhabitual = ({ work }) => {
     let navigate = useNavigate();
     const { id } = useParams();
-    const [pendingActivities, setPendingActivities] = useState(work[id].pendingTasks)
-    const [finishedActivities, setFinishedActivities] = useState(work[id].finishedTasks)
+    const [pendingActivities, setPendingActivities] = useState([])
+    const [finishedActivities, setFinishedActivities] = useState([])
     const [checked, setChecked] = useState(false)
     const [numbers, setNumber] = React.useState([])
     const [toRemove, setToRemove] = useState(0)
     const [buttonAble, setButtonAble] = useState(false);
     const [editable, setEditable] = useState(false)
     const [newTask, setNewTask] = useState({task:'',due:''})
+
+    // Data Details
+    const [goalData,setGoalData] = useState()
+
+    // Transactions
+    const [tasks, setTasks] = useState([])
+    useEffect(() => {
+        // getting the tasks data
+        var dbRefTrans = db.collection('users').doc(user.email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('tasks')
+        dbRefTrans.onSnapshot(snapshot => {
+            setTasks(snapshot.docs.map(doc => ({
+                id: doc.id,
+                task: doc.data(),
+            })));
+        })
+        
+        // getting the goal data
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Work').collection('WorkGoals').doc(id)
+        dbRef.get().then((doc) => {
+            var data = doc.data()
+            console.log(data.title)
+            setGoalData(data)
+        })
+        var currentPendingActivities = []
+        var currentFinishedActivities = []
+        if(tasks){
+            tasks.forEach(task => {
+                if(task.task.status == 'pending'){
+                    currentPendingActivities.push(task)
+                }else{
+                    currentFinishedActivities.push(task)
+                }
+            });
+            setFinishedActivities(currentFinishedActivities)
+            setPendingActivities(currentPendingActivities)
+        }
+
+    console.log(goalData)
+    }, [goalData]) 
+
+
+
+
     function deleteGoal() {
         let currentWork = work
         delete currentWork[id]
@@ -64,24 +109,23 @@ const Nonhabitual = ({ work }) => {
         console.log(numbers)
     }
     function addTask(e) {
-        let toRemoveVar = 0
-        let currentPending = pendingActivities
-        numbers.forEach(number => {
-            finishedActivities.push(currentPending[number])
-            delete currentPending[number]
-            toRemoveVar += 1
-            work[id].percentage = (finishedActivities.length / (finishedActivities.length + pendingActivities.length - toRemoveVar)) * 100
-        })
-        setPendingActivities(currentPending)
-        setNumber([])
-        setButtonAble(false)
-        setToRemove(toRemove + toRemoveVar)
+        // let toRemoveVar = 0
+        // let currentPending = pendingActivities
+        // numbers.forEach(number => {
+        //     finishedActivities.push(currentPending[number])
+        //     delete currentPending[number]
+        //     toRemoveVar += 1
+        //     work[id].percentage = (finishedActivities.length / (finishedActivities.length + pendingActivities.length - toRemoveVar)) * 100
+        // })
+        // setPendingActivities(currentPending)
+        // setNumber([])
+        // setButtonAble(false)
+        // setToRemove(toRemove + toRemoveVar)
 
     }
     function addNewTask(){
-         
-        pendingActivities.push(newTask) 
-        setNewTask({task:'',due:''})
+        // pendingActivities.push(newTask) 
+        // setNewTask({task:'',due:''})
     }
 
     const theme = createTheme({
@@ -92,8 +136,11 @@ const Nonhabitual = ({ work }) => {
             ].join(','),
         },
     });
-
+    const { user, setUser } = useContext(UserContext);
     return (
+        
+
+        goalData && tasks ?
         <ThemeProvider theme={theme}>
             <div className="pageLayout">
                 <Breadcrumbs aria-label="breadcrumb" sx={{ backgroundColor: 'white', marginTop: '20px' }}>
@@ -107,12 +154,12 @@ const Nonhabitual = ({ work }) => {
                     </Link>
                     <Link sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
                         <GppGoodIcon sx={{ mr: 0.5 }} fontSize="large" />
-                        {work[id].title}
+                        {goalData.title}
                     </Link>
                 </Breadcrumbs>
                 <div className="container">
                     <h1 className='boxtitle textheader' style={{ textAlign: 'left', fontSize: '50px', marginTop: '20px' }}>
-                        {work[id].title}
+                        {goalData.title}
                     </h1>
                     <br></br>
                     <Grid container spacing={1}>
@@ -122,7 +169,7 @@ const Nonhabitual = ({ work }) => {
                                     <h1>Current Progress</h1>
                                 </div>
                                 <div class="progress" style={{ height: '32px', marginTop: '20px', marginBottom: '20px' }}>
-                                    <div class="progress-bar bg-success" role="progressbar" style={{ width: `${(0+finishedActivities.length / ( 0+finishedActivities.length + pendingActivities.length - toRemove) * 100)}%` }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">{0 + (finishedActivities.length / (finishedActivities.length + pendingActivities.length - toRemove) * 100)}%</div>
+                                    <div class="progress-bar bg-success" role="progressbar" style={{ width: `${(0+finishedActivities.length / ( 0+finishedActivities.length + pendingActivities.length - toRemove) * 100)}%` }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">{0 + (finishedActivities.length / (finishedActivities.length + pendingActivities.length) * 100)}%</div>
                                 </div>
                             </Item>
                         </Grid>
@@ -153,8 +200,8 @@ const Nonhabitual = ({ work }) => {
                                                     <th scope="row">
                                                         <input key={index} type="checkbox" class="custom-control-input" onChange={e => addArray(e.target, index)} />
                                                     </th>
-                                                    <td>{activity.task}</td>
-                                                    <td>{activity.due}</td>
+                                                    <td>{activity.task.task}</td>
+                                                    <td>{activity.task.due}</td>
                                                 </tr>
                                             )) : pendingActivities.map((activity, index) => (
                                                 <tr>
@@ -201,9 +248,9 @@ const Nonhabitual = ({ work }) => {
                                                     <th scope="row">
                                                         <input type="checkbox" class="custom-control-input" id="customCheck3" checked />
                                                     </th>
-                                                    <td>{activity.task}</td>
+                                                    <td>{activity.task.task}</td>
 
-                                                    <td>{activity.due}</td>
+                                                    <td>{activity.task.due}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
@@ -226,7 +273,7 @@ const Nonhabitual = ({ work }) => {
                     </Grid>
                 </div>
             </div>
-        </ThemeProvider>
+        </ThemeProvider>: undefined
     );
 }
 

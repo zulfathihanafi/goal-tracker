@@ -1,5 +1,6 @@
 import logo from "../logo192.png";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
+import { auth, db } from "../components/firebase";
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container'
@@ -72,8 +73,22 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ForumIcon from '@mui/icons-material/Forum';
 import PeopleIcon from '@mui/icons-material/People';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-const HomeMentor = ({ user, userRole }) => {
+import { UserContext } from '../userContext'
+const HomeMentor = () => {
+    const {user,setUser} = useContext(UserContext);
+    const [userRole,setUserRole] = useState('')
+    useEffect(() => {
+        console.log("Home context "+user.email)
+        
 
+        db.collection("users").doc(user.email).get().then((doc) => {
+            var data = doc.data()
+            setUserRole(data.role)
+          })
+          
+          
+      }, [user]);
+    
     const theme = createTheme({
         typography: {
             fontFamily: [
@@ -101,7 +116,7 @@ const HomeMentor = ({ user, userRole }) => {
     }));
     
 
-    if (userRole == "mentor") {
+    if (userRole == "Mentor") {
         return (
             <ThemeProvider theme={theme}>
                 <body class="homebody">

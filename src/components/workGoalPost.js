@@ -1,19 +1,11 @@
-import { auth, db } from "../components/firebase";
-import { UserContext } from '../userContext'
-
-import { useState, useContext, useEffect } from "react";
+import { useState,useEffect,useContext } from "react";
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
-
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper';
-
 import CircularProgress from '@mui/material/CircularProgress';
-
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import Box from '@mui/material/Box';
-
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -21,19 +13,20 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
-
 import FormControl from '@mui/material/FormControl';
-
+import { UserContext } from '../userContext'
 import Divider from '@mui/material/Divider';
 
 import { Link } from 'react-router-dom';
 import '../styles/home.css'
 import { work, financial } from "../data/goals";
+import AddTaskIcon from '@mui/icons-material/AddTask';
 
 import { Navigate, useNavigate } from 'react-router-dom'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-
+import { mentee } from "../data/user";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { auth, db } from "../components/firebase";
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -43,29 +36,30 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
 }));
 
+const WorkGoalPost = ({goalData,id}) => {
 
-
-const FinancialGoalPost = ({goalData,id}) => {
-    const [transactions, setTransactions] = useState([])
-    
     const { user, setUser } = useContext(UserContext);
+    const [tasks, setTasks] = useState([])
+    
     useEffect(() => {
-        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions')
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('tasks')
         dbRef.onSnapshot(snapshot => {
-            setTransactions(snapshot.docs.map(doc => ({
+            setTasks(snapshot.docs.map(doc => ({
                 id: doc.id,
-                transaction: doc.data(),
+                task: doc.data()
             })));
         })
+        
     }, [id])
+
     return (
-        <Link to={`/goal3/${id}`} class="link">
+        <Link to={`/goal/${id}`} class="link">
                             <Grid container spacing={1} >
                                 <Grid item xs={12} >
                                     <Item sx={{ height: '100%', boxShadow: '3' }} style={{ padding: '20px', backgroundColor: "white" }}>
                                         <div className="row">
                                             <div className="col-8">
-                                                <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}>{goalData.Title}</Typography>
+                                                <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}>{goalData.title}</Typography>
                                             </div>
                                             <div className="col-4">
                                                 <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}><CalendarMonthIcon fontSize="large" style={{ marginRight: '10px' }} />{goalData.dueDate}</Typography>
@@ -78,7 +72,7 @@ const FinancialGoalPost = ({goalData,id}) => {
                                                     <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Overall Status</Typography>
                                                     <Box sx={{ position: 'relative', display: 'inline-flex' }} style={{ marginTop: '30px' }}>
                                                         <CircularProgress style={{ 'position': 'absolute', 'color': '#d9d9d9' }} variant="determinate" size={100} thickness={7} value={100} />
-                                                        <CircularProgress style={{ 'color': "blue" }} variant="determinate" size={100} thickness={7} value={goalData.currentPercentage} />
+                                                        <CircularProgress style={{ 'color': 'blue' }} variant="determinate" size={100} thickness={7} value={goalData.percentage} />
                                                         <Box
                                                             sx={{
                                                                 top: 0,
@@ -92,42 +86,36 @@ const FinancialGoalPost = ({goalData,id}) => {
                                                             }}
                                                         >
                                                             <Typography variant="h6" component="div" color="text.secondary">
-                                                                {`${Math.round(goalData.currentPercentage)}%`}
+                                                                {`${Math.round(goalData.percentage)}%`}
                                                             </Typography>
                                                         </Box>
                                                     </Box>
-                                                    <Typography>{goalData.currentPercentage}% Completed</Typography>
+                                                    <Typography>{goalData.percentage}% Completed</Typography>
                                                 </Item>
                                             </Grid>
                                             <Grid item xs={12} md={8}>
                                                 <Item sx={{ height: '100%', border: 1 }} style={{ backgroundColor: "#f7f6f6" }}>
-                                                    <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px', marginRight: '20px' }}>Recent Transaction <CurrencyExchangeIcon /></Typography>
+                                                    <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px', marginRight: '20px' }}>To-do List <AddTaskIcon /></Typography>
                                                     <div style={{ margin: '5px 50px' }}>
                                                         <table class="table">
                                                             <thead>
                                                                 <tr>
                                                                     <th scope="col" class="col-1">#</th>
-                                                                    <th scope="col" class="col-8">Transaction</th>
-                                                                    <th scope="col" class="col-3">Amount</th>
+                                                                    <th scope="col" class="col-8">Task</th>
+                                                                    <th scope="col" class="col-3">Due Date</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
-                                                                
-                                                                {transactions.slice(0, 3).map((transaction, index) => (
-                                                                    <tr>
+                                                                {tasks.map((activity, index) => (
+                                                                    activity.task.status == "pending" ? (
+                                                                        <tr>
                                                                         <th scope="row">
                                                                             {index + 1}
                                                                         </th>
-                                                                        <td>{transaction.transaction.details}</td>
-                                                                        <td>{transaction.transaction.type == 'Credit' ?
-                                                                            <strong
-                                                                                style={{ color: 'green' }}
-                                                                            >+ {transaction.transaction.amount.toFixed(2)}</strong> :
-                                                                            <strong
-                                                                                style={{ color: 'red' }}
-                                                                            >- {transaction.transaction.amount.toFixed(2)}</strong>}
-                                                                        </td>
+                                                                        <td>{activity.task.task}</td>
+                                                                        <td>{activity.task.due}</td>
                                                                     </tr>
+                                                                    ): undefined
                                                                 ))}
                                                             </tbody>
                                                         </table>
@@ -154,8 +142,7 @@ const FinancialGoalPost = ({goalData,id}) => {
                                 <Divider variant="middle" style={{ margin: "30px" }} />
                             </Grid>
                         </Link>
-        
     );
 }
 
-export default FinancialGoalPost;
+export default WorkGoalPost;

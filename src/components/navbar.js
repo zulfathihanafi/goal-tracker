@@ -12,7 +12,7 @@ import { UserContext } from '../userContext'
 
 
 const NavigationBar = () => {
-    const {user,setUser} = useContext(UserContext);
+    const {user,setUser,userRole,setUserRole} = useContext(UserContext);
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
           if (authUser) {
@@ -22,7 +22,7 @@ const NavigationBar = () => {
             
             db.collection("users").doc(authUser.email).get().then((doc) => {
               console.log("in register js " + doc.data().role)
-              
+              setUserRole(doc.data().role)
             })
             
           } else {
@@ -47,6 +47,7 @@ const NavigationBar = () => {
         // user[1](null)
         // userRole[1](undefined)
         setUser(undefined)
+        setUserRole(undefined)
     }
     if(user != null){
         return (

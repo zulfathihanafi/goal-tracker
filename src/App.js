@@ -33,6 +33,7 @@ import { Navigate, useNavigate } from 'react-router-dom';
 function App() {
 
   const [user, setUser] = useState(undefined);
+  const [userRole, setUserRole] = useState(undefined);
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
@@ -56,18 +57,18 @@ function App() {
       unsubscribe();
     }
   }, [user]);
-  const userRole = "mentee";
+  
   return (
     <Router>
 
 
       <div style={{ backgroundColor: "white" }} >
-        <div><UserContext.Provider value={{user,setUser}}>
+        <div><UserContext.Provider value={{user,setUser,userRole,setUserRole}}>
           {/* if user is available (Logged In)*/}
           {/* {user ?  : undefined} */}
           <NavigationBar />
 
-          {user?<Routes>
+          {user && userRole?<Routes>
             
             <Route exact path='/' element={<Register  />} />
             <Route exact path='/goal/:id' element={<Nonhabitual work={work} />} />
@@ -75,7 +76,7 @@ function App() {
             <Route exact path='/goal3/:id' element={<Finance />} />
 
             {/* This is home route */}
-            {userRole == "mentor" ?
+            {userRole == "Mentor" ?
 
               <Route exact path='/home' element={<HomeMentor />} />
               :

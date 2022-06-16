@@ -124,7 +124,7 @@ const Item3 = styled(Paper)(({ theme }) => ({
 }));
 
 const Home = () => {
-    //var userRole ="Mentee
+    // var userRole ="Mentee"
     const {user,setUser} = useContext(UserContext);
     
     const [userData,setUserData] = useState({ name: '', email: '',occupation:'', phone: '' })

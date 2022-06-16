@@ -161,8 +161,8 @@ const Register = () => {
                                         <input type="password" placeholder="" onChange={e => registerUser.rpassword = e.target.value} />
                                         <label>Role </label>
                                         <select name="role" id="role" onChange={e => registerUser.role = e.target.value}>
-                                            <option value="mentee">Mentee</option>
-                                            <option value="mentor">Mentor</option>
+                                            <option value="Mentee">Mentee</option>
+                                            <option value="Mentor">Mentor</option>
                                         </select>
                                         <input type="button" value="Register Now" onClick={signUp} />
                                     </form>
