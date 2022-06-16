@@ -5,16 +5,37 @@ import React from "react";
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
 import logo from './logo2.jpg'
-import { auth } from "./firebase";
+import { auth,db } from "./firebase";
 import zul from './zul.jpg';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { UserContext } from '../userContext'
 
 
-
-const NavigationBar = ({user,userRole}) => {
-useEffect(() => {
-    console.log(user[0].uid)
-}, [])
+const NavigationBar = () => {
+    const {user,setUser} = useContext(UserContext);
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged((authUser) => {
+          if (authUser) {
+            //user has logged in
+            console.log("in App js " + authUser.displayName);
+            setUser(authUser)
+            
+            db.collection("users").doc(authUser.email).get().then((doc) => {
+              console.log("in register js " + doc.data().role)
+              
+            })
+            
+          } else {
+            //user logged out
+      
+          }
+        })
+      
+        return () => {
+          //perform some cleanup actions
+          unsubscribe();
+        }
+      }, [user]);
 
     let [color, setColor] = React.useState('none');
     const pathname = window.location.pathname
@@ -23,8 +44,9 @@ useEffect(() => {
     let navigate = useNavigate()
     function signOut() {
         auth.signOut().then(navigate(`/`)).catch((error)=>alert(error.message))
-        user[1](null)
-        userRole[1](undefined)
+        // user[1](null)
+        // userRole[1](undefined)
+        setUser(undefined)
     }
     if(user != null){
         return (

@@ -72,7 +72,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ForumIcon from '@mui/icons-material/Forum';
 import PeopleIcon from '@mui/icons-material/People';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-const HomeMentor = ({ userRole }) => {
+const HomeMentor = ({ user, userRole }) => {
 
     const theme = createTheme({
         typography: {

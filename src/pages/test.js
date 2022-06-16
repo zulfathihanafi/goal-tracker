@@ -1,111 +1,56 @@
-import React, { useState, useEffect } from "react"
+// const [user, setUser] = useContext('undefined')
+// const [userRole, setUserRole] = useState(undefined)
 
-const Test = () => {
-    const [pendingActivities, setPendingActivities] = useState([{ task: 'task delegation', due: "20 April 2020" }, { task: 'user research', due: "20 April 2020" }, { task: 'presentation', due: "20 April 2020" }, { task: 'start coding', due: "20 April 2020" }])
-    const [finishedActivities, setFinishedActivities] = useState([])
-    const [current, setCurrent] = React.useState(2)
-    const [numbers, setNumber] = React.useState([])
-    const [allchecked, setAllchecked] = useState(false);
-    const [buttonAble, setButtonAble] = useState(false);
+// useEffect(() => {
+//   const unsubscribe = auth.onAuthStateChanged((authUser) => {
+//     if (authUser) {
+//       //user has logged in
+//       console.log("in App js " + authUser.displayName);
+//       setUser(authUser)
+      
+//       db.collection("users").doc(authUser.email).get().then((doc) => {
+//         console.log("in register js " + doc.data().role)
+//         setUserRole(doc.data().role)
+//       })
+//       if (authUser.displayName) {
+//         //dont update username
+//       } else {
+//         //if we just created someone
+//         return authUser.updateProfile({
 
-    function addArray(target, index) {
-        if (target.checked) {
-            numbers.push(index)
-        } else {
-            delete numbers[index]
-            numbers.sort()
-            numbers.pop()
-        }
+//         });
+//       }
+//     } else {
+//       //user logged out
 
-        if (numbers.length > 0) {
-            setButtonAble(true)
-        } else {
-            setButtonAble(false)
-        }
-        console.log(numbers)
-    }
-    function addTask(e) {
+//     }
+//   })
 
-        numbers.forEach(number => {
-            finishedActivities.push(pendingActivities[number])
-            delete pendingActivities[number]
-
-        })
-
-        setNumber([])
-        setButtonAble(false)
-        setAllchecked(false)
-    }
-
-    return (
-        <div className="pageLayout">
-            <div className="container">
-                <h1 className='boxtitle textheader' style={{ textAlign: 'center' }}>
-                    Programming Project
-                </h1>
-                <br></br>
-                <div class="align-self-center" style={{width:'100%'}}>
-                    <h4>Current Progress :</h4>
-                </div>
-
-                <div class="progress" style={{ height: '32px' }}>
-                    <div class="progress-bar bg-success" role="progressbar" style={{ width: `${(finishedActivities.length / (pendingActivities.length) * 100)}%` }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">{0+(finishedActivities.length / (pendingActivities.length) * 100)}%</div>
-                </div>
+//   return () => {
+//     //perform some cleanup actions
+//     unsubscribe();
+//   }
+// }, [user]);
 
 
+// <Route exact path='/' element={<Register user={[user, setUser]} userRole={[userRole, setUserRole]} />} />
+//               <Route exact path='/goal/:id' element={<Nonhabitual work={work} />} />
+//               <Route exact path='/goal2' element={<Habitual />} />
+//               <Route exact path='/goal3/:id' element={<Finance financial={financial} />} />
 
-                <div className='boxactivity'>
-                    <h1>Pending Activities</h1>
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col" class="col-2">#</th>
-                                <th scope="col" class="col-6">Goal</th>
-                                <th scope="col" class="col-4">Due Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {pendingActivities.map((activity, index) => (
-                                <tr>
-                                    <th scope="row">
-                                        <input key={index} type="checkbox" defaultChecked={false} class="custom-control-input" id="customCheck3" onClick={e => setAllchecked} onChange={e => addArray(e.target, index)} />
-                                    </th>
-                                    <td>{activity.task}</td>
-                                    <td>{activity.due}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    <div class="row justify-content-end">
-                        <div class="col-10"></div>
-                        <button style={{ marginRight: '20px' }} className="btn btn-light col-2" disabled={!buttonAble} onClick={e => addTask(e.target)}>Task Done</button>
-                    </div>
-                    <h1>Finished Activities</h1>
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th scope="col" class="col-2">#</th>
-                                <th scope="col" class="col-6">Goal</th>
-                                <th scope="col" class="col-4">Due Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {finishedActivities.map((activity) => (
-                                <tr>
-                                    <th scope="row">
-                                        <input type="checkbox" class="custom-control-input" id="customCheck3" checked />
-                                    </th>
-                                    <td>{activity.task}</td>
-                                    <td>{activity.due}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+//               {/* This is home route */}
+//               {userRole == "mentor" ?
+//                 <Route exact path='/home' element={<HomeMentor userRole={userRole} />} />
+//                 :
+//                 <Route exact path='/home' element={<Home userEmail={user} userRole={userRole} />} />
+//               }
+//               <Route exact path='/profile' element={<Profile user={[user, setUser]} />} />
 
-                </div>
-            </div>
-        </div>
-    );
-}
 
-export default Test;
+//               <Route exact path='/workgoals' element={<WorkGoals />} />
+//               <Route exact path='/financialgoals' element={<FinancialGoals />} />
+
+
+//               <Route exact path='/menteeprofile' element={<MenteeProfile />} />
+//               <Route exact path='/comments' element={<Comments />} />
+//               <Route exact path='/menteenonhabitual' element={<MenteeNonhabitual />} />

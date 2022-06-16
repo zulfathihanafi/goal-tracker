@@ -1,3 +1,4 @@
+import { UserContext } from './userContext'
 import 'bootstrap/dist/css/bootstrap.css';
 import $ from 'jquery';
 import Popper from 'popper.js';
@@ -27,83 +28,74 @@ import {
   Route,
   Link, Redirect
 } from 'react-router-dom';
-import React, { Component, useEffect, useState } from 'react';
+import React, { Component, useEffect, useState, useContext, useReducer } from 'react';
 import { auth, db } from './components/firebase';
 import { Navigate, useNavigate } from 'react-router-dom';
+
+
 function App() {
 
-  //let navigate = useNavigate();
-  const [user, setUser] = useState(undefined)
-  const [userRole, setUserRole] = useState(undefined)
-
-  // useEffect(() => {
-  //   if(user == undefined){
-  //     navigate(`/Register`);
-  //   }
-  // }, [user])
+  const [user, setUser] = useState(undefined);
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
         //user has logged in
         console.log("in App js " + authUser.displayName);
         setUser(authUser)
+        
         db.collection("users").doc(authUser.email).get().then((doc) => {
           console.log("in register js " + doc.data().role)
-          setUserRole(doc.data().role)
+          
         })
-        if (authUser.displayName) {
-          //dont update username
-        } else {
-          //if we just created someone
-          return authUser.updateProfile({
-
-          });
-        }
+        
       } else {
         //user logged out
-
+  
       }
     })
-
+  
     return () => {
       //perform some cleanup actions
       unsubscribe();
     }
   }, [user]);
+  const userRole = "mentee";
   return (
     <Router>
 
 
       <div style={{ backgroundColor: "white" }} >
-        <div>
+        <div><UserContext.Provider value={{user,setUser}}>
           {/* if user is available (Logged In)*/}
-          {user ? <NavigationBar user={[user, setUser]} userRole={[userRole, setUserRole]} /> : undefined}
-
+          {/* {user ?  : undefined} */}
+          <NavigationBar />
           <Routes>
+            
+              <Route exact path='/' element={<Register  />} />
+              <Route exact path='/goal/:id' element={<Nonhabitual work={work} />} />
+              <Route exact path='/goal2' element={<Habitual />} />
+              <Route exact path='/goal3/:id' element={<Finance financial={financial} />} />
 
-            <Route exact path='/' element={<Register user={[user, setUser]} userRole={[userRole, setUserRole]} />} />
-            <Route exact path='/goal/:id' element={<Nonhabitual work={work} />} />
-            <Route exact path='/goal2' element={<Habitual />} />
-            <Route exact path='/goal3/:id' element={<Finance financial={financial} />} />
-           
-           {/* This is home route */}
-            {userRole == "mentor" ?
-              <Route exact path='/home' element={<HomeMentor userRole={userRole} />} />
-              :
-              <Route exact path='/home' element={<Home userRole={userRole} />} />
-            }
+              {/* This is home route */}
+              {userRole == "mentor" ?
 
-            <Route exact path='/login' element={<Login />} />
-            <Route exact path='/profile' element={<Profile />} />
-            <Route exact path='/test' element={<Test />} />
-            <Route exact path='/workgoals' element={<WorkGoals />} />
-            <Route exact path='/financialgoals' element={<FinancialGoals />} />
+                <Route exact path='/home' element={<HomeMentor />} />
+                :
+                <Route exact path='/home' element={<Home />} />
+              }
+              <Route exact path='/profile' element={<Profile />} />
 
-           
-            <Route exact path='/menteeprofile' element={<MenteeProfile />} />
-            <Route exact path='/comments' element={<Comments />} />
-            <Route exact path='/menteenonhabitual' element={<MenteeNonhabitual />} />
+
+              <Route exact path='/workgoals' element={<WorkGoals />} />
+              <Route exact path='/financialgoals' element={<FinancialGoals />} />
+
+
+              <Route exact path='/menteeprofile' element={<MenteeProfile />} />
+              <Route exact path='/comments' element={<Comments />} />
+              <Route exact path='/menteenonhabitual' element={<MenteeNonhabitual />} />
+            
           </Routes>
+          </UserContext.Provider>
         </div>
 
 

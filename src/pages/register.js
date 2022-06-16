@@ -1,14 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState,useContext} from "react";
+import { UserContext } from '../userContext'
 import { Navigate, useNavigate } from 'react-router-dom';
 import { auth, db } from "../components/firebase";
-import { user } from "../components/userState";
 import "../styles/register.css";
 import logo from './logo2.jpg';
 import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 
-const Register = ({ user, userRole }) => {
+const Register = () => {
+    const {user,setUser} = useContext(UserContext);
     let navigate = useNavigate();
     const [chooseForm, setForm] = useState('login')
     const [chooseRegisterColor, setRegisterColor] = useState("#d9d9d9")
@@ -42,10 +43,13 @@ const Register = ({ user, userRole }) => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
             if (authUser) {
                 //user has logged in
+                
                 console.log(authUser);
+                setUser(auth)
+                //user[1](authUser)
                 db.collection("users").doc(authUser.email).get().then((doc) => {
                     console.log("in register js " + doc.data().role)
-                    userRole[1](doc.data().role)
+                    //userRole[1](doc.data().role)
                 })
                 navigate(`/home`)
                 if (authUser.displayName) {
@@ -70,18 +74,7 @@ const Register = ({ user, userRole }) => {
 
 
     const [loginUser, setLoginUser] = useState({ email: '', password: '', role: '' })
-    const [registerUser, setRegisterUser] = useState({ name: '', email: '', phone: '', password: '', rpassword: '', role: 'mentee' })
-    function login() {
-        let currentUser = loginUser
-        setLoginUser(currentUser)
-        if (loginUser.email == "k@gmail.com" && loginUser.password == "123456") {
-            user[1](loginUser)
-            navigate(`/home`);
-        } else {
-            alert("No profile found ! Please register first")
-        }
-
-    }
+    const [registerUser, setRegisterUser] = useState({ name: '', email: '',occupation:'', phone: '', password: '', rpassword: '', role: 'mentee' })
     const signIn = (event) => {
         event.preventDefault();
 
@@ -98,16 +91,18 @@ const Register = ({ user, userRole }) => {
         auth
             .createUserWithEmailAndPassword(registerUser.email, registerUser.password)
             .then((authUser) => {
+                
                 authUser.user.updateProfile({
                     displayName: registerUser.name,
-
+                    
                 })
 
                 db.collection("users").doc(registerUser.email).set({
 
                     displayName: registerUser.name,
                     phoneNumber: registerUser.phone,
-                    role: registerUser.role
+                    role: registerUser.role,
+                    occupation: registerUser.occupation
 
                 })
             })
@@ -158,6 +153,8 @@ const Register = ({ user, userRole }) => {
                                         <input type="email" placeholder="" onChange={e => registerUser.email = e.target.value} />
                                         <label>Phone Number</label>
                                         <input type="text" placeholder="" onChange={e => registerUser.phone = e.target.value} />
+                                        <label>Occupation</label>
+                                        <input type="text" placeholder="" onChange={e => registerUser.occupation = e.target.value} />
                                         <label>Password</label>
                                         <input type="password" placeholder="" onChange={e => registerUser.password = e.target.value} />
                                         <label>Confirm Password</label>

@@ -1,11 +1,14 @@
 import logo from "../logo192.png";
-import { useState, useEffect } from "react";
+import { auth, db } from "../components/firebase";
+import { useState, useEffect,useContext } from "react";
+import { UserContext } from '../userContext'
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper';
+import WorkIcon from '@mui/icons-material/Work';
 import PropTypes from 'prop-types';
 import CircularProgress from '@mui/material/CircularProgress';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -74,6 +77,7 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import ForumIcon from '@mui/icons-material/Forum';
 import PeopleIcon from '@mui/icons-material/People';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import BadgeIcon from '@mui/icons-material/Badge';
 ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -119,10 +123,27 @@ const Item3 = styled(Paper)(({ theme }) => ({
     boxShadow: 'none',
 }));
 
-const Home = ({ userRole }) => {
+const Home = () => {
+    var userRole ="Mentee"
+    const {user,setUser} = useContext(UserContext);
+    
+    const [userData,setUserData] = useState({ name: '', email: '',occupation:'', phone: '' })
     useEffect(() => {
-        console.log(userRole)
-    }, [])
+        console.log("Home context "+user.email)
+        
+
+        db.collection("users").doc(user.email).get().then((doc) => {
+            var data = doc.data()
+            setUserData({ name: data.displayName, email: user.email,occupation:data.occupation, phone: data.phoneNumber })
+          })
+          
+          
+      }, [user]);
+
+
+
+
+
     const options = {
         indexAxis: 'y',
         elements: {
@@ -177,12 +198,10 @@ const Home = ({ userRole }) => {
     const [newTask, setNewTask] = React.useState([])
 
     const [enableEdit, setEdit] = React.useState(true)
-    const [currentUser, setUser] = React.useState(mentee)
+    
 
     let navigate = useNavigate()
-    function addTasks() {
-
-    }
+    
 
     function addWorkGoal() {
         setOpenWork(false)
@@ -222,34 +241,36 @@ const Home = ({ userRole }) => {
                 { details: '', amount: 0, type: '', date: "" }]
         })
     }
-    if (userRole == "mentee") {
+    if (userRole == "Mentee") {
         return (
             <ThemeProvider theme={theme}>
                 <div class="homeBody" style={{ height: '100%', width: '100%' }}>
                     <Grid container spacing={2} justifyContent="flex-start" alignItems="flex-start" >
-                        <Grid item xs={3} style={{ marginTop: "40px", height: "100%" }}>
-                            <Item3 sx={{ height: '100%', backgroundColor: '#f7f6f6' }}>
-                                <Box display='flex' justifyContent='center' alignItems='center'>
-                                    <Avatar src={zul} sx={{ width: '200px', height: '200px' }} />
-                                </Box>
-                                <Container sx={{ marginLeft: '60px', marginTop: '30px' }}>
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold', textAlign: 'left' }}>@fatehiimranhanafi</Typography>
-                                    <Typography sx={{ textAlign: 'left', fontSize: '15' }}>Student</Typography>
-                                    <Typography variant="h6" style={{ marginTop: '25px', textAlign: 'left' }}><LocationOnIcon sx={{ marginRight: '10px' }} />Kemamang, Ganu</Typography>
-                                    <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><EmailIcon sx={{ marginRight: '10px' }} />fatehiimran@gmail.com</Typography>
-                                    <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><LocalPhoneIcon sx={{ marginRight: '10px' }} />0182026040</Typography>
-                                    <Typography variant="h4" sx={{ marginTop: '70px', textAlign: 'left' }}>Ongoing Activities</Typography>
-                                    <Box display='flex' justifyContent='flex-start' alignItems='center' sx={{ backgroundColor: '#26a326', borderRadius: '16px', marginTop: '20px', width: '200px' }}>
-                                        <TrackChangesIcon sx={{ color: 'white', width: '50px', height: '50px', marginLeft: '10px', marginRight: '10px' }} />
-                                        <Typography sx={{ marginBottom: '20px', color: 'white' }}>Work Goals: 3</Typography>
+                            <Grid item xs={3} style={{ marginTop: "40px", height: "100%" }}>
+                                <Item3 sx={{ height: '100%', backgroundColor: '#f7f6f6' }}>
+                                    <Box display='flex' justifyContent='center' alignItems='center'>
+                                        <Avatar src={zul} sx={{ width: '200px', height: '200px' }} />
                                     </Box>
-                                    <Box display='flex' justifyContent='flex-start' alignItems='center' sx={{ backgroundColor: '#c22370', borderRadius: '16px', marginTop: '20px', width: '200px' }}>
-                                        <MonetizationOnIcon sx={{ color: 'white', width: '50px', height: '50px', marginLeft: '10px', marginRight: '10px' }} />
-                                        <Typography sx={{ marginBottom: '20px', color: 'white' }}>Financial Goal: 4</Typography>
-                                    </Box>
-                                </Container>
-                            </Item3>
-                        </Grid>
+
+                                    {/* Profile content */}
+
+                                    <Container sx={{ marginLeft: '60px', marginTop: '30px' }}>
+                                        <Typography variant="h5" sx={{ fontWeight: 'bold', textAlign: 'left' }}>{userData.name}</Typography>
+                                        <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><WorkIcon sx={{ marginRight: '10px' }} />{userData.occupation}</Typography>
+                                        <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><EmailIcon sx={{ marginRight: '10px' }} />{userData.email}</Typography>
+                                        <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><LocalPhoneIcon sx={{ marginRight: '10px' }} />{userData.phone}</Typography>
+                                        <Typography variant="h4" sx={{ marginTop: '70px', textAlign: 'left' }}>Ongoing Activities</Typography>
+                                        <Box display='flex' justifyContent='flex-start' alignItems='center' sx={{ backgroundColor: '#26a326', borderRadius: '16px', marginTop: '20px', width: '200px' }}>
+                                            <TrackChangesIcon sx={{ color: 'white', width: '50px', height: '50px', marginLeft: '10px', marginRight: '10px' }} />
+                                            <Typography sx={{ marginBottom: '20px', color: 'white' }}>Work Goals: 3</Typography>
+                                        </Box>
+                                        <Box display='flex' justifyContent='flex-start' alignItems='center' sx={{ backgroundColor: '#c22370', borderRadius: '16px', marginTop: '20px', width: '200px' }}>
+                                            <MonetizationOnIcon sx={{ color: 'white', width: '50px', height: '50px', marginLeft: '10px', marginRight: '10px' }} />
+                                            <Typography sx={{ marginBottom: '20px', color: 'white' }}>Financial Goal: 4</Typography>
+                                        </Box>
+                                    </Container>
+                                </Item3>
+                            </Grid>
                         <Grid item xs={9} >
                             <Item3 sx={{ height: '100%', marginRight: '100px', marginTop: '40px', backgroundColor: '#f7f6f6' }}>
                                 <Grid container spacing={1}>
