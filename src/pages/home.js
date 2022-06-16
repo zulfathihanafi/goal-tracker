@@ -124,10 +124,11 @@ const Item3 = styled(Paper)(({ theme }) => ({
 }));
 
 const Home = () => {
-    var userRole ="Mentee"
+    //var userRole ="Mentee
     const {user,setUser} = useContext(UserContext);
     
     const [userData,setUserData] = useState({ name: '', email: '',occupation:'', phone: '' })
+    const [userRole,setUserRole] = useState('')
     useEffect(() => {
         console.log("Home context "+user.email)
         
@@ -135,6 +136,7 @@ const Home = () => {
         db.collection("users").doc(user.email).get().then((doc) => {
             var data = doc.data()
             setUserData({ name: data.displayName, email: user.email,occupation:data.occupation, phone: data.phoneNumber })
+            setUserRole(data.role)
           })
           
           
@@ -241,6 +243,8 @@ const Home = () => {
                 { details: '', amount: 0, type: '', date: "" }]
         })
     }
+
+
     if (userRole == "Mentee") {
         return (
             <ThemeProvider theme={theme}>

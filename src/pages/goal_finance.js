@@ -1,16 +1,12 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
+
+import { UserContext } from '../userContext'
+
 import bootstrap from 'bootstrap'
 import '../styles/nonhabitual.css'
 import LinearProgress from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
-import Backdrop from '@mui/material/Backdrop';
-import SpeedDial from '@mui/material/SpeedDial';
-import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import SpeedDialAction from '@mui/material/SpeedDialAction';
-import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import PrintIcon from '@mui/icons-material/Print';
-import ShareIcon from '@mui/icons-material/Share';
+import { auth, db } from "../components/firebase";
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -59,7 +55,7 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const Finance = ({ financial }) => {
     const { id } = useParams();
-    var currentFinancialGoal = financial[id]
+    
     const [newTransaction, setNewTransaction] = useState({
         details: '',
         amount: 0,
@@ -71,44 +67,53 @@ const Finance = ({ financial }) => {
     const handleOpen = () => setOpen(true);
     const handleClickOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-    const [numbers, setNumber] = React.useState([])
+
     const [buttonAble, setButtonAble] = useState(false);
-    const [targetMoney, setTargetMoney] = useState(currentFinancialGoal.target)
-    const [currentMoney, setCurrentMoney] = useState(currentFinancialGoal.current)
-    const [percentage, setPercentage] = useState(currentFinancialGoal.percentage)
+    const [targetMoney, setTargetMoney] = useState(1)
+    const [currentMoney, setCurrentMoney] = useState(0)
+    const [percentage, setPercentage] = useState()
     const [editable, setEditable] = useState(false)
+
+    // Data Details
+    const [goalData,setGoalData] = useState()
+
+    // Transactions
+    const [transactions, setTransactions] = useState([])
     let navigate = useNavigate();
 
     function deleteGoal() {
-        let currentFinance = financial
-        delete currentFinance[id]
-
-        financial = currentFinance
         navigate('/home')
     }
-    function addArray(target, index) {
-        if (target.checked) {
-            numbers.push(index)
-        } else {
-            delete numbers[index]
-            numbers.sort()
-            numbers.pop()
-        }
+    
 
-        if (numbers.length > 0) {
-            setButtonAble(true)
-        } else {
-            setButtonAble(false)
-        }
-        console.log(numbers)
-    }
+    const { user, setUser } = useContext(UserContext);
+    
     useEffect(() => {
-        let newPercentage = Math.round((currentMoney / targetMoney) * 100)
-        console.log("new percentage" + newPercentage)
-        currentFinancialGoal.percentage = newPercentage;
-        setPercentage(newPercentage)
-    }, [currentMoney])
+        // getting the transactions data
+        var dbRefTrans = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions')
+        dbRefTrans.onSnapshot(snapshot => {
+            setTransactions(snapshot.docs.map(doc => ({
+                id: doc.id,
+                transaction: doc.data(),
+            })));
+        })
+        
+        // getting the goal data
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id)
+        dbRef.get().then((doc) => {
+            var data = doc.data()
+            console.log(data.Title)
+            setGoalData(data)
+        })
+    console.log(goalData)
+    }, [id]) 
+
+
+
+
+
     const addTransactionDialog = (<Dialog open={open} onClose={handleClose} fullWidth="xl">
+
         <DialogTitle style={{ fontSize: "30px" }}>Add New Transaction</DialogTitle>
         <FormControl>
             <DialogContent onChange={e => {
@@ -177,28 +182,28 @@ const Finance = ({ financial }) => {
         </DialogActions>
     </Dialog>)
     function addTransaction(e) {
-        console.log(newTransaction)
+        // console.log(newTransaction)
 
-        currentFinancialGoal.transactions.unshift(newTransaction)
-        if (newTransaction.type == "Debit") {
-            setCurrentMoney(currentMoney - newTransaction.amount)
-            currentFinancialGoal.current = currentMoney
+        // currentFinancialGoal.transactions.unshift(newTransaction)
+        // if (newTransaction.type == "Debit") {
+        //     setCurrentMoney(currentMoney - newTransaction.amount)
+        //     currentFinancialGoal.current = currentMoney
 
-        } else {
-            setCurrentMoney(currentMoney + newTransaction.amount)
-            currentFinancialGoal.current = currentMoney
-        }
-        console.log('add trans')
+        // } else {
+        //     setCurrentMoney(currentMoney + newTransaction.amount)
+        //     currentFinancialGoal.current = currentMoney
+        // }
+        // console.log('add trans')
 
 
-        setNewTransaction({
-            details: '',
-            amount: 0,
-            type: 'Credit',
-            date: moment().format('ll')
-        })
+        // setNewTransaction({
+        //     details: '',
+        //     amount: 0,
+        //     type: 'Credit',
+        //     date: moment().format('ll')
+        // })
 
-        handleClose()
+        // handleClose()
     }
 
     const theme = createTheme({
@@ -209,8 +214,9 @@ const Finance = ({ financial }) => {
             ].join(','),
         },
     });
-
+    
     return (
+        goalData&&transactions?
         <ThemeProvider theme={theme}>
             <div className="pageLayout">
                 <Breadcrumbs aria-label="breadcrumb" sx={{ backgroundColor: 'white', marginTop: '20px' }}>
@@ -224,12 +230,14 @@ const Finance = ({ financial }) => {
                         </Link>
                         <Link sx={{ display: 'flex', alignItems: 'center' }} color="text.primary">
                             <GppGoodIcon sx={{ mr: 0.5 }} fontSize="large" />
-                            {currentFinancialGoal.title}
+                            {/* {currentFinancialGoal.title} */}
+                            {goalData.Title}
                         </Link>
                 </Breadcrumbs>
                 <div className="container">
                     <h1 className='boxtitle textheader' style={{ textAlign: 'left', fontSize: '50px', marginTop: '20px' }}>
-                        {currentFinancialGoal.title}
+                        {/* {currentFinancialGoal.title} */}
+                        {goalData.Title}
                     </h1>
                     <br></br>
                     <Grid container spacing={1}>
@@ -239,7 +247,7 @@ const Finance = ({ financial }) => {
                                     <h1>Current Progress</h1>
                                 </div>
                                 <div class="progress" style={{ height: '32px', marginTop: '20px', marginBottom: '20px' }}>
-                                    <div class="progress-bar bg-success" role="progressbar" style={{ width: `${Math.round((currentMoney / targetMoney) * 100)}%` }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">{0 + Math.round((currentMoney / targetMoney) * 100)}%</div>
+                                    <div class="progress-bar bg-success" role="progressbar" style={{ width: `${Math.round((goalData.current / goalData.target) * 100)}%` }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">{0+Math.round((goalData.current / goalData.target) * 100)}%</div>
                                 </div>
                             </Item>
                         </Grid>
@@ -251,11 +259,11 @@ const Finance = ({ financial }) => {
                                     <div class="row text-center">
                                         <div class="col border-end ">
                                             <h1>Target :</h1>
-                                            <h2>RM {targetMoney.toFixed(2)}</h2>
+                                            <h2>RM {goalData.target.toFixed(2)}</h2>
                                         </div>
                                         <div class="col">
                                             <h1>Current Total :</h1>
-                                            <h2>RM {currentMoney.toFixed(2)}</h2>
+                                            <h2>RM {goalData.current.toFixed(2)}</h2>
                                         </div>
                                     </div>
                                     <br></br>
@@ -284,7 +292,27 @@ const Finance = ({ financial }) => {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {!editable ? currentFinancialGoal.transactions.map((transaction, index) => (
+                                        {transactions.map((transaction, index) => (
+                                                <tr>
+                                                    <th scope="row">
+                                                        {index + 1}
+                                                    </th>
+                                                    <td>{transaction.transaction.details}</td>
+                                                    <td>
+                                                        {transaction.transaction.type == 'Credit' ?
+                                                            <strong
+                                                                style={{ color: 'green' }}
+                                                            >+ {transaction.transaction.amount.toFixed(2)}</strong> :
+                                                            <strong
+                                                                style={{ color: 'red' }}
+                                                            >- {transaction.transaction.amount.toFixed(2)}</strong>}
+                                                    </td>
+                                                    <td><strong>{transaction.transaction.type}</strong></td>
+                                                    <td>{transaction.transaction.date}</td>
+                                                </tr>
+                                            ))}
+{/*                                             
+                                            {!editable ? transactions.map((transaction, index) => (
                                                 <tr>
                                                     <th scope="row">
                                                         {index + 1}
@@ -302,7 +330,7 @@ const Finance = ({ financial }) => {
                                                     <td><strong>{transaction.type}</strong></td>
                                                     <td>{transaction.date}</td>
                                                 </tr>
-                                            )) : currentFinancialGoal.transactions.map((transaction, index) => (
+                                            )) : transactions.map((transaction, index) => (
                                                 <tr>
                                                     <th scope="row">
                                                         {index + 1}
@@ -322,10 +350,10 @@ const Finance = ({ financial }) => {
                                                             
                                                         >
                                                             
-                                                                <MenuItem key="credit" value="Credit">
+                                                                <MenuItem key="credit" value="credit">
                                                                     Credit
                                                                 </MenuItem>
-                                                                <MenuItem key="debit" value="Debit">
+                                                                <MenuItem key="debit" value="debit">
                                                                     Debit
                                                                 </MenuItem>
                                                             
@@ -334,7 +362,7 @@ const Finance = ({ financial }) => {
                                                     <td>{transaction.date}</td>
                                                 </tr>
                                             ))}
-                                            
+                                             */}
                                         </tbody>
                                     </table>                 
                                     {editable ? <input type="button" value="Save Goal" onClick={e => { setEditable(!editable) }} /> : <div></div>}
@@ -355,6 +383,7 @@ const Finance = ({ financial }) => {
                 </div>
             </div>
         </ThemeProvider>
+    : undefined
     );
 }
 

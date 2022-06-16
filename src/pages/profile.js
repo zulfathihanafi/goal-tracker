@@ -1,7 +1,7 @@
 import "../styles/profile.css"
 import React from "react";
 import { Input, TextField } from "@mui/material";
-import { mentee } from "../data/user";
+
 import { useEffect, useState, useContext } from "react";
 import { UserContext } from '../userContext'
 
@@ -48,8 +48,6 @@ const Profile = () => {
             console.log("update error : "+error.message)
         })
         setEdit(!enableEdit)
-        let newUserProfile = mentee
-
         //setUser(newUserProfile)
     }
     return (

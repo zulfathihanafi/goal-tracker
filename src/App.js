@@ -10,9 +10,6 @@ import Register from './pages/register';
 import Nonhabitual from './pages/goal_nonhabitual';
 import NavigationBar from './components/navbar';
 import Home from './pages/home'
-import Login from './pages/login';
-import Test from './pages/test';
-import Habitual from './pages/goal_habitual';
 import Finance from './pages/goal_finance';
 import Profile from './pages/profile';
 import WorkGoals from './pages/workgoals';
@@ -69,32 +66,39 @@ function App() {
           {/* if user is available (Logged In)*/}
           {/* {user ?  : undefined} */}
           <NavigationBar />
-          <Routes>
+
+          {user?<Routes>
             
-              <Route exact path='/' element={<Register  />} />
-              <Route exact path='/goal/:id' element={<Nonhabitual work={work} />} />
-              <Route exact path='/goal2' element={<Habitual />} />
-              <Route exact path='/goal3/:id' element={<Finance financial={financial} />} />
-
-              {/* This is home route */}
-              {userRole == "mentor" ?
-
-                <Route exact path='/home' element={<HomeMentor />} />
-                :
-                <Route exact path='/home' element={<Home />} />
-              }
-              <Route exact path='/profile' element={<Profile />} />
-
-
-              <Route exact path='/workgoals' element={<WorkGoals />} />
-              <Route exact path='/financialgoals' element={<FinancialGoals />} />
-
-
-              <Route exact path='/menteeprofile' element={<MenteeProfile />} />
-              <Route exact path='/comments' element={<Comments />} />
-              <Route exact path='/menteenonhabitual' element={<MenteeNonhabitual />} />
+            <Route exact path='/' element={<Register  />} />
+            <Route exact path='/goal/:id' element={<Nonhabitual work={work} />} />
             
-          </Routes>
+            <Route exact path='/goal3/:id' element={<Finance />} />
+
+            {/* This is home route */}
+            {userRole == "mentor" ?
+
+              <Route exact path='/home' element={<HomeMentor />} />
+              :
+              <Route exact path='/home' element={<Home />} />
+            }
+            <Route exact path='/profile' element={<Profile />} />
+
+
+            <Route exact path='/workgoals' element={<WorkGoals />} />
+            <Route exact path='/financialgoals' element={<FinancialGoals />} />
+
+
+            <Route exact path='/menteeprofile' element={<MenteeProfile />} />
+            <Route exact path='/comments' element={<Comments />} />
+            <Route exact path='/menteenonhabitual' element={<MenteeNonhabitual />} />
+          
+        </Routes>:
+        <Routes>
+            <Route exact path='/' element={<Register  />} />
+        </Routes>}
+
+
+         
           </UserContext.Provider>
         </div>
 
