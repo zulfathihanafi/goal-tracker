@@ -35,9 +35,21 @@ const Profile = () => {
 
 
     function saveProfile() {
+
+        db.collection("users").doc(user.email).get().then((doc) => {
+            console.log("in register js " + doc.data().role)
+            //userRole[1](doc.data().role)
+        })
+        db.collection("users").doc(user.email).update({
+                displayName : userName,
+                occupation : userOccupation,
+                phoneNumber : userPhone
+        }).catch((error)=>{
+            console.log("update error : "+error.message)
+        })
         setEdit(!enableEdit)
         let newUserProfile = mentee
-        
+
         //setUser(newUserProfile)
     }
     return (
