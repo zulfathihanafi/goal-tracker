@@ -45,12 +45,12 @@ const Item = styled(Paper)(({ theme }) => ({
 
 
 
-const FinancialGoalPost = ({goalData,id}) => {
+const FinancialGoalPost = ({goalData,id,email}) => {
     const [transactions, setTransactions] = useState([])
     
     const { user, setUser } = useContext(UserContext);
     useEffect(() => {
-        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions')
+        var dbRef = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions')
         dbRef.onSnapshot(snapshot => {
             setTransactions(snapshot.docs.map(doc => ({
                 id: doc.id,

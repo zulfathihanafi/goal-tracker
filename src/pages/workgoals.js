@@ -150,7 +150,8 @@ const WorkGoals = () => {
                     {workGoals.map((goal, index) => (
                         <WorkGoalPost 
                         goalData ={goal.post} 
-                        id={goal.id}/>
+                        id={goal.id}
+                        email={user.email}/>
                     )) }
                     <div>
 

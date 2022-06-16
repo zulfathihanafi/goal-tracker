@@ -9,7 +9,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 
 const Register = () => {
-    const {user,setUser} = useContext(UserContext);
+    const {user,setUser,userRole,setUserRole} = useContext(UserContext);
     let navigate = useNavigate();
     const [chooseForm, setForm] = useState('login')
     const [chooseRegisterColor, setRegisterColor] = useState("#d9d9d9")
@@ -74,7 +74,7 @@ const Register = () => {
 
 
     const [loginUser, setLoginUser] = useState({ email: '', password: '', role: '' })
-    const [registerUser, setRegisterUser] = useState({ name: '', email: '',occupation:'', phone: '', password: '', rpassword: '', role: 'mentee' })
+    const [registerUser, setRegisterUser] = useState({ name: '', email: '',occupation:'', phone: '', password: '', rpassword: '', role: 'Mentee' })
     const signIn = (event) => {
         event.preventDefault();
 
@@ -103,8 +103,9 @@ const Register = () => {
                     phoneNumber: registerUser.phone,
                     role: registerUser.role,
                     occupation: registerUser.occupation
-
+                    
                 })
+                setUserRole(registerUser.role)
             })
             .catch((error) => alert(error.message));
 

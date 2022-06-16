@@ -3,69 +3,23 @@ import { useState, useContext, useEffect } from "react";
 import { auth, db } from "../components/firebase";
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
-import Container from '@mui/material/Container'
+
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper';
-import PropTypes from 'prop-types';
+
 import CircularProgress from '@mui/material/CircularProgress';
-import LinearProgress from '@mui/material/LinearProgress';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
+
 import Box from '@mui/material/Box';
-import Backdrop from '@mui/material/Backdrop';
-import SpeedDial from '@mui/material/SpeedDial';
-import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import SpeedDialAction from '@mui/material/SpeedDialAction';
-import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import PrintIcon from '@mui/icons-material/Print';
-import ShareIcon from '@mui/icons-material/Share';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { pink } from '@mui/material/colors';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
 import Divider from '@mui/material/Divider';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Link } from 'react-router-dom';
+
 import '../styles/homementor.css'
-import { work, financial } from "../data/goals";
-import AddTaskIcon from '@mui/icons-material/AddTask';
-import Input from '@mui/material/Input';
-import { Navigate, useNavigate } from 'react-router-dom'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { mentee } from "../data/user";
+
 import Avatar from '@mui/material/Avatar';
 import { deepPurple } from '@mui/material/colors';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    Title,
-    Tooltip,
-    Legend,
-  } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
-
-import ViewListIcon from '@mui/icons-material/ViewList';
-
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import FaceIcon from '@mui/icons-material/Face';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -74,30 +28,42 @@ import ForumIcon from '@mui/icons-material/Forum';
 import PeopleIcon from '@mui/icons-material/People';
 import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
 import { UserContext } from '../userContext'
+import MenteeCard from "../components/menteeCard";
+
 const HomeMentor = () => {
-    const {user,setUser} = useContext(UserContext);
-    const [userRole,setUserRole] = useState('')
+    const { user, setUser } = useContext(UserContext);
+    const [userRole, setUserRole] = useState('')
+    const [mentees, setMentees] = useState([]);
     useEffect(() => {
-        console.log("Home context "+user.email)
+        console.log("Home context " + user.email)
         
 
         db.collection("users").doc(user.email).get().then((doc) => {
             var data = doc.data()
             setUserRole(data.role)
-          })
-          
-          
-      }, [user]);
-    
+        })
+
+        var dbRef = db.collection('users').where("role","==","Mentee")
+        dbRef.onSnapshot(snapshot => {
+            setMentees(snapshot.docs.map(doc => ({
+                id: doc.id,
+                data: doc.data(),
+                
+            })));
+        })
+
+
+    }, [user]);
+
     const theme = createTheme({
         typography: {
             fontFamily: [
-                'Nunito', 
+                'Nunito',
                 'sans-serif',
             ].join(','),
         },
     });
-    
+
     const Item = styled(Paper)(({ theme }) => ({
         backgroundColor: theme.palette.mode === 'white' ? '#fff' : '#fff',
         ...theme.typography.body2,
@@ -114,7 +80,7 @@ const HomeMentor = () => {
         color: theme.palette.text.secondary,
         boxShadow: 'none',
     }));
-    
+
 
     if (userRole == "Mentor") {
         return (
@@ -217,207 +183,13 @@ const HomeMentor = () => {
                             Mentee List
                             <PeopleIcon fontSize="large" sx={{ width: 40, height: 40, marginLeft: '20px', marginBottom: '10px' }} />
                         </Typography>
+                        
                         <Grid container spacing={2}>
-                            <Grid item xs={3}>
-                                <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main' }}>
-                                    <Box display="flex" justifyContent='center' alignItems='center' sx={{ marginTop: "10px" }}>
-                                        <Avatar sx={{ width: "80px", height: "80px", bgcolor: deepPurple[500] }}>M1</Avatar>
-                                    </Box>
-                                    <Typography variant="h5" sx={{ marginTop: "20px", color: "black" }}>
-                                        Mentee 1
-                                    </Typography>
-                                    <Stack sx={{ marginTop: "20px" }} justifyContent='center' alignItems='baseline' direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                3 <br></br>completed
-                                            </Typography>
-                                        </Item2>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                12 <br></br> incomplete
-                                            </Typography>
-                                        </Item2>
-                                    </Stack>
-                                    <Button variant="outlined" sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        View Profile
-                                    </Button>
-                                </Item>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main' }}>
-                                    <Box display="flex" justifyContent='center' alignItems='center' sx={{ marginTop: "10px" }}>
-                                        <Avatar sx={{ width: "80px", height: "80px", bgcolor: deepPurple[500] }}>M1</Avatar>
-                                    </Box>
-                                    <Typography variant="h5" sx={{ marginTop: "20px", color: "black" }}>
-                                        Mentee 1
-                                    </Typography>
-                                    <Stack sx={{ marginTop: "20px" }} justifyContent='center' alignItems='baseline' direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                3 <br></br>completed
-                                            </Typography>
-                                        </Item2>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                12 <br></br> incomplete
-                                            </Typography>
-                                        </Item2>
-                                    </Stack>
-                                    <Button variant="outlined" sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        View Profile
-                                    </Button>
-                                </Item>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main' }}>
-                                    <Box display="flex" justifyContent='center' alignItems='center' sx={{ marginTop: "10px" }}>
-                                        <Avatar sx={{ width: "80px", height: "80px", bgcolor: deepPurple[500] }}>M1</Avatar>
-                                    </Box>
-                                    <Typography variant="h5" sx={{ marginTop: "20px", color: "black" }}>
-                                        Mentee 1
-                                    </Typography>
-                                    <Stack sx={{ marginTop: "20px" }} justifyContent='center' alignItems='baseline' direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                3 <br></br>completed
-                                            </Typography>
-                                        </Item2>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                12 <br></br> incomplete
-                                            </Typography>
-                                        </Item2>
-                                    </Stack>
-                                    <Button variant="outlined" sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        View Profile
-                                    </Button>
-                                </Item>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main' }}>
-                                    <Box display="flex" justifyContent='center' alignItems='center' sx={{ marginTop: "10px" }}>
-                                        <Avatar sx={{ width: "80px", height: "80px", bgcolor: deepPurple[500] }}>M1</Avatar>
-                                    </Box>
-                                    <Typography variant="h5" sx={{ marginTop: "20px", color: "black" }}>
-                                        Mentee 1
-                                    </Typography>
-                                    <Stack sx={{ marginTop: "20px" }} justifyContent='center' alignItems='baseline' direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                3 <br></br>completed
-                                            </Typography>
-                                        </Item2>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                12 <br></br> incomplete
-                                            </Typography>
-                                        </Item2>
-                                    </Stack>
-                                    <Button variant="outlined" sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        View Profile
-                                    </Button>
-                                </Item>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main' }}>
-                                    <Box display="flex" justifyContent='center' alignItems='center' sx={{ marginTop: "10px" }}>
-                                        <Avatar sx={{ width: "80px", height: "80px", bgcolor: deepPurple[500] }}>M1</Avatar>
-                                    </Box>
-                                    <Typography variant="h5" sx={{ marginTop: "20px", color: "black" }}>
-                                        Mentee 1
-                                    </Typography>
-                                    <Stack sx={{ marginTop: "20px" }} justifyContent='center' alignItems='baseline' direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                3 <br></br>completed
-                                            </Typography>
-                                        </Item2>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                12 <br></br> incomplete
-                                            </Typography>
-                                        </Item2>
-                                    </Stack>
-                                    <Button variant="outlined" sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        View Profile
-                                    </Button>
-                                </Item>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main' }}>
-                                    <Box display="flex" justifyContent='center' alignItems='center' sx={{ marginTop: "10px" }}>
-                                        <Avatar sx={{ width: "80px", height: "80px", bgcolor: deepPurple[500] }}>M1</Avatar>
-                                    </Box>
-                                    <Typography variant="h5" sx={{ marginTop: "20px", color: "black" }}>
-                                        Mentee 1
-                                    </Typography>
-                                    <Stack sx={{ marginTop: "20px" }} justifyContent='center' alignItems='baseline' direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                3 <br></br>completed
-                                            </Typography>
-                                        </Item2>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                12 <br></br> incomplete
-                                            </Typography>
-                                        </Item2>
-                                    </Stack>
-                                    <Button variant="outlined" sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        View Profile
-                                    </Button>
-                                </Item>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main' }}>
-                                    <Box display="flex" justifyContent='center' alignItems='center' sx={{ marginTop: "10px" }}>
-                                        <Avatar sx={{ width: "80px", height: "80px", bgcolor: deepPurple[500] }}>M1</Avatar>
-                                    </Box>
-                                    <Typography variant="h5" sx={{ marginTop: "20px", color: "black" }}>
-                                        Mentee 1
-                                    </Typography>
-                                    <Stack sx={{ marginTop: "20px" }} justifyContent='center' alignItems='baseline' direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                3 <br></br>completed
-                                            </Typography>
-                                        </Item2>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                12 <br></br> incomplete
-                                            </Typography>
-                                        </Item2>
-                                    </Stack>
-                                    <Button variant="outlined" sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        View Profile
-                                    </Button>
-                                </Item>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main' }}>
-                                    <Box display="flex" justifyContent='center' alignItems='center' sx={{ marginTop: "10px" }}>
-                                        <Avatar sx={{ width: "80px", height: "80px", bgcolor: deepPurple[500] }}>M1</Avatar>
-                                    </Box>
-                                    <Typography variant="h5" sx={{ marginTop: "20px", color: "black" }}>
-                                        Mentee 1
-                                    </Typography>
-                                    <Stack sx={{ marginTop: "20px" }} justifyContent='center' alignItems='baseline' direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                3 <br></br>completed
-                                            </Typography>
-                                        </Item2>
-                                        <Item2>
-                                            <Typography variant="h6">
-                                                12 <br></br> incomplete
-                                            </Typography>
-                                        </Item2>
-                                    </Stack>
-                                    <Button variant="outlined" sx={{ marginTop: '20px', marginBottom: '20px' }}>
-                                        View Profile
-                                    </Button>
-                                </Item>
-                            </Grid>
+                        {mentees.map((mentee, index) => (
+                        <MenteeCard menteeData = {mentee}/>
+                        
+                    )) }
+                            
                         </Grid>
                     </div>
                     <div >
@@ -439,8 +211,8 @@ const HomeMentor = () => {
             >
                 <Grid item xs={3}>
                     <div>
-                    <Avatar className="App-logo" src={logo} sx={{ width: '200px', height: '200px' }} />
-                </div>
+                        <Avatar className="App-logo" src={logo} sx={{ width: '200px', height: '200px' }} />
+                    </div>
                 </Grid>
 
             </Grid>

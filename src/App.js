@@ -89,7 +89,7 @@ function App() {
             <Route exact path='/financialgoals' element={<FinancialGoals />} />
 
 
-            <Route exact path='/menteeprofile' element={<MenteeProfile />} />
+            <Route exact path='/menteeprofile/:id' element={<MenteeProfile />} />
             <Route exact path='/comments' element={<Comments />} />
             <Route exact path='/menteenonhabitual' element={<MenteeNonhabitual />} />
           

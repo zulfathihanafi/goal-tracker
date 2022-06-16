@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import { auth, db } from "../components/firebase";
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container'
@@ -69,8 +70,8 @@ import EmailIcon from '@mui/icons-material/Email';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import zul from './zul.jpg';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-
-
+import { useParams } from "react-router";
+import WorkIcon from '@mui/icons-material/Work';
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
@@ -107,7 +108,21 @@ ChartJS.register(
   );
 
 const MenteeProfile = () => {
+    const { id } = useParams(); // id is email
+    const [userData,setUserData] = useState({ name: '', email: '',occupation:'', phone: '' })
+    const [userRole,setUserRole] = useState('')
+    useEffect(() => {
+        console.log("Home context "+id)
+        
 
+        db.collection("users").doc(id).get().then((doc) => {
+            var data = doc.data()
+            setUserData({ name: data.displayName, email: id,occupation:data.occupation, phone: data.phoneNumber })
+            setUserRole(data.role)
+          })
+          
+          
+      }, []);
     const [newWorkGoal, setNewWorkGoal] = React.useState({
         title: "",
         percentage: 0,
@@ -225,11 +240,10 @@ const MenteeProfile = () => {
                                         <Avatar src={zul} sx={{ width: '200px', height: '200px' }} />
                                 </Box>
                                 <Container sx={{ marginLeft: '60px', marginTop: '30px', marginBottom: '30px' }}>
-                                    <Typography variant="h4" sx={{ fontWeight: 'bold', textAlign: 'left' }}>@fatehiimran</Typography>
-                                    <Typography sx={{ textAlign: 'left', fontSize: '15' }}>Student</Typography> 
-                                    <Typography variant="h6" style={{ marginTop: '25px', textAlign: 'left' }}><LocationOnIcon sx={{ marginRight: '10px' }}/>Kemamang, Ganu</Typography>                                   
-                                    <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left'}}><EmailIcon sx={{ marginRight: '10px' }}/>fatehiimran@gmail.com</Typography>
-                                    <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><LocalPhoneIcon sx={{ marginRight: '10px' }}/>0182026040</Typography>
+                                    <Typography variant="h5" sx={{ fontWeight: 'bold', textAlign: 'left' }}>{userData.name}</Typography>
+                                    <Typography variant="h6" style={{ marginTop: '25px', textAlign: 'left' }}><WorkIcon sx={{ marginRight: '10px' }} />{userData.occupation}</Typography>
+                                    <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left'}}><EmailIcon sx={{ marginRight: '10px' }}/>{userData.email}</Typography>
+                                    <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><LocalPhoneIcon sx={{ marginRight: '10px' }}/>{userData.phone}</Typography>
                                     <Box display='flex' justifyContent='flex-start' alignItems='center' sx={{ backgroundColor: '#26a326', borderRadius: '16px', marginTop: '20px', width: '200px' }}>                                        
                                             <TrackChangesIcon sx={{ color: 'white', width: '50px', height: '50px', marginLeft: '10px', marginRight: '10px' }}/>
                                             <Typography sx={{ marginBottom: '20px', color: 'white' }}>Work Goals: 3</Typography>

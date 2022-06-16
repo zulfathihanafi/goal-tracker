@@ -169,7 +169,7 @@ const Home = () => {
         labels,
         datasets: [
             {
-                label: 'Percentage%',
+                label: 'Percentage %',
                 data: [30, 60, 70, 10, 100, 40, 80],
                 borderColor: 'rgb(255, 99, 132)',
                 backgroundColor: 'rgba(255, 99, 132, 0.5)',

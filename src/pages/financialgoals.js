@@ -170,7 +170,7 @@ const Financialgoals = () => {
                         <FinancialGoalPost
                             goalData = {goal.post}
                             id = {goal.id}
-                        
+                            email = {user.email}
                         />))}
                 </div>
             </body>
