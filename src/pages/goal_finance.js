@@ -53,8 +53,8 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
 }));
 
-const Finance = ({ financial }) => {
-    const { id } = useParams();
+const Finance = () => {
+    const { id,email } = useParams();
     
     const [newTransaction, setNewTransaction] = useState({
         details: '',
@@ -87,10 +87,20 @@ const Finance = ({ financial }) => {
     
 
     const { user, setUser } = useContext(UserContext);
+
     
+  
     useEffect(() => {
-        // getting the transactions data
-        var dbRefTrans = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions')
+        readData()
+        
+    }, [updateData()])
+
+    useEffect(() => {
+        updateData()
+    }, [transactions])
+
+    function readData(){
+        var dbRefTrans = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions')
         dbRefTrans.onSnapshot(snapshot => {
             setTransactions(snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -99,15 +109,45 @@ const Finance = ({ financial }) => {
         })
         
         // getting the goal data
-        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id)
+        var dbRef = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id)
         dbRef.get().then((doc) => {
             var data = doc.data()
             console.log(data.Title)
             setGoalData(data)
         })
-    console.log(goalData)
-    }, [id]) 
+        console.log(goalData)
+    }
 
+
+    function updateData() { //incase ada perubahan
+        var current = 0
+        console.log('updating data')
+        
+        if(goalData){transactions.forEach(transaction => {
+            if(transaction.transaction.type == 'Debit'){
+                current -= transaction.transaction.amount
+            }else{
+                current += transaction.transaction.amount
+            }
+        });
+
+        var currentPercentage = Math.round((current / goalData.target) * 100)
+        if(currentPercentage > 100) {
+            currentPercentage = 100
+        }
+        
+        var dbRef = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id)
+        dbRef.update({
+            currentPercentage : currentPercentage,
+            current : current
+        })
+        
+        goalData.current = current
+        goalData.currentPercentage = currentPercentage
+    
+    }
+        
+    }
 
 
 
@@ -161,7 +201,7 @@ const Finance = ({ financial }) => {
                     <br></br>
 
                     <div class="btn-group" role="group" aria-label="Basic radio toggle button group" style={{ marginTop: '10px' }}>
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked
+                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" defaultChecked
                             onClick={e => { newTransaction.type = "Credit" }} />
                         <label class="btn btn-outline-primary" for="btnradio1">Credit</label>
 
@@ -193,17 +233,25 @@ const Finance = ({ financial }) => {
         //     setCurrentMoney(currentMoney + newTransaction.amount)
         //     currentFinancialGoal.current = currentMoney
         // }
-        // console.log('add trans')
+        console.log('add trans')
+        var dbRef = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions').doc()
+        dbRef.set({
 
-
-        // setNewTransaction({
-        //     details: '',
-        //     amount: 0,
-        //     type: 'Credit',
-        //     date: moment().format('ll')
-        // })
-
-        // handleClose()
+            amount : newTransaction.amount,
+            date : newTransaction.date,
+            details : newTransaction.details,
+            type : newTransaction.type
+            
+        }).then(console.log("Success add transaction"))
+        
+        setNewTransaction({
+            details: '',
+            amount: 0,
+            type: 'Credit',
+            date: moment().format('ll')
+        })
+        updateData()
+        handleClose()
     }
 
     const theme = createTheme({
@@ -247,7 +295,7 @@ const Finance = ({ financial }) => {
                                     <h1>Current Progress</h1>
                                 </div>
                                 <div class="progress" style={{ height: '32px', marginTop: '20px', marginBottom: '20px' }}>
-                                    <div class="progress-bar bg-success" role="progressbar" style={{ width: `${Math.round((goalData.current / goalData.target) * 100)}%` }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">{0+Math.round((goalData.current / goalData.target) * 100)}%</div>
+                                    <div class="progress-bar bg-success" role="progressbar" style={{ width: `${goalData.currentPercentage}%` }} aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">{0+goalData.currentPercentage}%</div>
                                 </div>
                             </Item>
                         </Grid>
@@ -269,7 +317,7 @@ const Finance = ({ financial }) => {
                                     <br></br>
                                     <br></br>
                                     <Box display="flex" justifyContent='center' alignItems='center'>
-                                            <Button color="success" variant="contained">
+                                            <Button color="success" variant="contained" onClick={handleOpen}>
                                                 Add New Transaction
                                             </Button>
                                             {addTransactionDialog}

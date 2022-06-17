@@ -59,7 +59,7 @@ const FinancialGoalPost = ({goalData,id,email}) => {
         })
     }, [id])
     return (
-        <Link to={`/goal3/${id}`} class="link">
+        <Link to={`/goal3/${email}/${id}`} class="link">
                             <Grid container spacing={1} >
                                 <Grid item xs={12} >
                                     <Item sx={{ height: '100%', boxShadow: '3' }} style={{ padding: '20px', backgroundColor: "white" }}>

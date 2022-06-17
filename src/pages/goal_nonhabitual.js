@@ -32,9 +32,9 @@ const Item = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
 }));
 
-const Nonhabitual = ({ work }) => {
+const Nonhabitual = () => {
     let navigate = useNavigate();
-    const { id } = useParams();
+    const { id,email } = useParams();
     const [pendingActivities, setPendingActivities] = useState([])
     const [finishedActivities, setFinishedActivities] = useState([])
     const [checked, setChecked] = useState(false)
@@ -51,7 +51,7 @@ const Nonhabitual = ({ work }) => {
     const [tasks, setTasks] = useState([])
     useEffect(() => {
         // getting the tasks data
-        var dbRefTrans = db.collection('users').doc(user.email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('tasks')
+        var dbRefTrans = db.collection('users').doc(email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('tasks')
         dbRefTrans.onSnapshot(snapshot => {
             setTasks(snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -60,7 +60,7 @@ const Nonhabitual = ({ work }) => {
         })
         
         // getting the goal data
-        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Work').collection('WorkGoals').doc(id)
+        var dbRef = db.collection('users').doc(email).collection("Goals").doc('Work').collection('WorkGoals').doc(id)
         dbRef.get().then((doc) => {
             var data = doc.data()
             console.log(data.title)
@@ -87,10 +87,10 @@ const Nonhabitual = ({ work }) => {
 
 
     function deleteGoal() {
-        let currentWork = work
-        delete currentWork[id]
-        work = currentWork
-        navigate('/home')
+        // let currentWork = work
+        // delete currentWork[id]
+        // work = currentWork
+        // navigate('/home')
     }
     function addArray(target, index) {
         if (target.checked) {
@@ -209,9 +209,9 @@ const Nonhabitual = ({ work }) => {
                                                         <input key={index} type="checkbox" class="custom-control-input" onChange={e => addArray(e.target, index)} />
                                                     </th>
                                                     <td>
-                                                    <Input defaultValue={activity.task} onChange={e=>{activity.task = e.target.value}} />
+                                                    <Input defaultValue={activity.task.task} onChange={e=>{activity.task = e.target.value}} />
                                                 </td>
-                                                    <td><Input defaultValue={activity.due} onChange={e=>{activity.due = e.target.value}} /></td>
+                                                    <td><Input defaultValue={activity.task.due} onChange={e=>{activity.due = e.target.value}} /></td>
                                                 </tr>
                                                 
                                             ))}

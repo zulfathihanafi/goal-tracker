@@ -72,6 +72,10 @@ import zul from './zul.jpg';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { useParams } from "react-router";
 import WorkIcon from '@mui/icons-material/Work';
+import FinancialGoalPost from "../components/financialGoalPost";
+import WorkGoalPost from "../components/workGoalPost";
+
+
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
@@ -111,6 +115,8 @@ const MenteeProfile = () => {
     const { id } = useParams(); // id is email
     const [userData,setUserData] = useState({ name: '', email: '',occupation:'', phone: '' })
     const [userRole,setUserRole] = useState('')
+    const [financialGoals, setFinancialGoals] = useState([]);
+    const [workGoals, setWorkGoals] = useState([]);
     useEffect(() => {
         console.log("Home context "+id)
         
@@ -120,9 +126,29 @@ const MenteeProfile = () => {
             setUserData({ name: data.displayName, email: id,occupation:data.occupation, phone: data.phoneNumber })
             setUserRole(data.role)
           })
-          
+          var dbRef = db.collection('users').doc(id).collection("Goals").doc('Financial').collection('FinancialGoals')
+          dbRef.onSnapshot(snapshot => {
+              setFinancialGoals(snapshot.docs.map(doc => ({
+                  id: doc.id,
+                  post: doc.data(),
+                  
+              })));
+          })
+          console.log(financialGoals)
+
+          var dbRefWork = db.collection('users').doc(id).collection("Goals").doc('Work').collection('WorkGoals')
+        dbRefWork.onSnapshot(snapshot => {
+            setWorkGoals(snapshot.docs.map(doc => ({
+                id: doc.id,
+                post: doc.data(),
+                
+            })));
+        })
           
       }, []);
+
+      
+    
     const [newWorkGoal, setNewWorkGoal] = React.useState({
         title: "",
         percentage: 0,
@@ -279,193 +305,26 @@ const MenteeProfile = () => {
                         Work Goals
                         <TrackChangesIcon sx={{ width: 50, height: 50, marginLeft: '10px', marginBottom: '10px' }} fontSize="large" />
                     </Typography>
-                    {workDrop ? work.map((goal, index) => (
-                        <Link to={`/goal/${index}`} class="link">
-                            <Grid container spacing={1} >
-                                <Grid item xs={12} >
-                                    <Item sx={{ height: '100%', boxShadow: 3}} style={{ padding: '20px', backgroundColor: "white" }}>
-                                        <div className="row">
-                                            <div className="col-8">
-                                                <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}>{goal.title}</Typography>
-                                            </div>
-                                            <div className="col-4">
-                                                <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}><CalendarMonthIcon fontSize="large" style={{ marginRight: '10px' }} />{goal.dueDate}</Typography>
-                                            </div>
-                                        </div>
-                                        <Divider style={{ marginBottom: '15px' }} />
-                                        <Grid container spacing={3}>
-                                            <Grid item xs={12} md={4}>
-                                                <Item sx={{ height: '100%', border: 1 }} style={{ backgroundColor: "#f7f6f6" }}>
-                                                    <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Overall Status</Typography>
-                                                    <Box sx={{ position: 'relative', display: 'inline-flex' }} style={{ marginTop: '30px' }}>
-                                                        <CircularProgress style={{ 'position': 'absolute', 'color': '#fff' }} variant="determinate" size={100} thickness={7} value={100} />
-                                                        <CircularProgress style={{ 'color': 'blue' }} variant="determinate" size={100} thickness={7} value={goal.percentage} />
-                                                        <Box
-                                                            sx={{
-                                                                top: 0,
-                                                                left: 0,
-                                                                bottom: 0,
-                                                                right: 0,
-                                                                position: 'absolute',
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                            }}
-                                                        >
-                                                            <Typography variant="h6" component="div" color="text.secondary">
-                                                                {`${Math.round(goal.percentage)}%`}
-                                                            </Typography>
-                                                        </Box>
-                                                    </Box>
-                                                    <Typography>{goal.percentage}% Completed</Typography>
-                                                </Item>
-                                            </Grid>
-                                            <Grid item xs={12} md={8}>
-                                                <Item sx={{ height: '100%', border: 1}} style={{ backgroundColor: "#f7f6f6" }}>
-                                                    <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px', marginRight: '20px' }}>To-do List <AddTaskIcon /></Typography>
-                                                    <div style={{ margin: '5px 50px' }}>
-                                                        <table class="table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th scope="col" class="col-1">#</th>
-                                                                    <th scope="col" class="col-8">Task</th>
-                                                                    <th scope="col" class="col-3">Due Date</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {goal.pendingTasks.map((activity, index) => (
-                                                                    <tr>
-                                                                        <th scope="row">
-                                                                            {index + 1}
-                                                                        </th>
-                                                                        <td>{activity.task}</td>
-                                                                        <td>{activity.due}</td>
-                                                                    </tr>
-                                                                ))}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </Item>
+                    {/* For Work data */}
+                    {workGoals.map((goal, index) => (
+                        <WorkGoalPost 
+                        goalData ={goal.post} 
+                        id={goal.id}
+                        email={id}/>
+                    )) }
 
-                                            </Grid>
-                                            {/* <Grid item xs={12} md={12}>
-                                            <Item sx={{ height: '100%' }}>
-                                                <h6 variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Description</h6>
-                                                <p sx={{ textAlign: 'left', pl: '10px' }}>
-                                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-                                                    blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur,
-                                                    neque doloribus, cupiditate numquam dignissimos laborum fugiat deleniti? Eum
-                                                    quasi quidem quibusdam.
-                                                </p>
-                                            </Item>
-                                        </Grid> */}
-                                        </Grid>
-                                    </Item>
 
-                                </Grid>
-
-                                <Divider variant="middle" style={{ margin: "30px" }} />
-                            </Grid>
-                        </Link>)) : <div ></div>}
                     <div></div>
                     <Typography variant="h3" sx={{ marginBottom: '30px', marginTop: '50px' }}>
                         Financial Goals
                         <MonetizationOnIcon sx={{ width: 50, height: 50, marginLeft: '10px', marginBottom: '10px' }} fontSize="large" />
                     </Typography>
-                    {financialDrop ? financial.map((goal, index) => (
-                        <Link to={`/goal3/${index}`} class="link">
-                            <Grid container spacing={1} >
-                                <Grid item xs={12} >
-                                    <Item sx={{ height: '100%', boxShadow: 3}} style={{ padding: '20px', backgroundColor: "white" }}>
-                                        <div className="row">
-                                            <div className="col-8">
-                                                <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}>{goal.title}</Typography>
-                                            </div>
-                                            <div className="col-4">
-                                                <Typography variant="h4" justifyContent="flex-start" style={{ textAlign: 'left', paddingLeft: '10px', marginTop: '5px', marginBottom: '5px', color: 'black' }}><CalendarMonthIcon fontSize="large" style={{ marginRight: '10px' }} />{goal.dueDate}</Typography>
-                                            </div>
-                                        </div>
-                                        <Divider style={{ marginBottom: '15px' }} />
-                                        <Grid container spacing={3}>
-                                            <Grid item xs={12} md={4}>
-                                                <Item sx={{ height: '100%', border: 1}} style={{ backgroundColor: "#f7f6f6" }}>
-                                                    <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Overall Status</Typography>
-                                                    <Box sx={{ position: 'relative', display: 'inline-flex' }} style={{ marginTop: '30px' }}>
-                                                        <CircularProgress style={{ 'position': 'absolute', 'color': '#fff' }} variant="determinate" size={100} thickness={7} value={100} />
-                                                        <CircularProgress style={{ 'color': "blue" }} variant="determinate" size={100} thickness={7} value={goal.percentage} />
-                                                        <Box
-                                                            sx={{
-                                                                top: 0,
-                                                                left: 0,
-                                                                bottom: 0,
-                                                                right: 0,
-                                                                position: 'absolute',
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center',
-                                                            }}
-                                                        >
-                                                            <Typography variant="h6" component="div" color="text.secondary">
-                                                                {`${Math.round(goal.percentage)}%`}
-                                                            </Typography>
-                                                        </Box>
-                                                    </Box>
-                                                    <Typography>{goal.percentage}% Completed</Typography>
-                                                </Item>
-                                            </Grid>
-                                            <Grid item xs={12} md={8}>
-                                                <Item sx={{ height: '100%', border: 1}} style={{ backgroundColor: "#f7f6f6" }}>
-                                                    <Typography variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px', marginRight: '20px' }}>Recent Transaction <CurrencyExchangeIcon /></Typography>
-                                                    <div style={{ margin: '5px 50px' }}>
-                                                        <table class="table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th scope="col" class="col-1">#</th>
-                                                                    <th scope="col" class="col-8">Transaction</th>
-                                                                    <th scope="col" class="col-3">Amount</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                {goal.transactions.slice(0, 3).map((transaction, index) => (
-                                                                    <tr>
-                                                                        <th scope="row">
-                                                                            {index + 1}
-                                                                        </th>
-                                                                        <td>{transaction.details}</td>
-                                                                        <td>{transaction.type == 'Credit' ?
-                                                                            <strong
-                                                                                style={{ color: 'green' }}
-                                                                            >+ {transaction.amount.toFixed(2)}</strong> :
-                                                                            <strong
-                                                                                style={{ color: 'red' }}
-                                                                            >- {transaction.amount.toFixed(2)}</strong>}</td>
-                                                                    </tr>
-                                                                ))}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </Item>
-
-                                            </Grid>
-                                            {/* <Grid item xs={12} md={12}>
-                                            <Item sx={{ height: '100%' }}>
-                                                <h6 variant="h6" style={{ color: "black", textAlign: "left", paddingLeft: '10px' }}>Description</h6>
-                                                <p sx={{ textAlign: 'left', pl: '10px' }}>
-                                                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos
-                                                    blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur,
-                                                    neque doloribus, cupiditate numquam dignissimos laborum fugiat deleniti? Eum
-                                                    quasi quidem quibusdam.
-                                                </p>
-                                            </Item>
-                                        </Grid> */}
-                                        </Grid>
-                                    </Item>
-
-                                </Grid>
-
-                                <Divider variant="middle" style={{ margin: "30px" }} />
-                            </Grid>
-                        </Link>)) : <div ></div>}
+                    {financialGoals.map((goal, index) => (
+                        <FinancialGoalPost
+                            goalData = {goal.post}
+                            id = {goal.id}
+                            email = {id}
+                        />))}
                 </div>
             </body>
         </ThemeProvider>

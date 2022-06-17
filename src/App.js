@@ -71,9 +71,9 @@ function App() {
           {user && userRole?<Routes>
             
             <Route exact path='/' element={<Register  />} />
-            <Route exact path='/goal/:id' element={<Nonhabitual work={work} />} />
+            <Route exact path='/goal/:email/:id' element={<Nonhabitual  />} />
             
-            <Route exact path='/goal3/:id' element={<Finance />} />
+            <Route exact path='/goal3/:email/:id' element={<Finance />} />
 
             {/* This is home route */}
             {userRole == "Mentor" ?

@@ -74,6 +74,7 @@ const Financialgoals = () => {
 
     const [userData, setUserData] = useState({})
     const [userRole, setUserRole] = useState('')
+    
     useEffect(() => {
         //where the code runs, cond after the comma
         var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals')
