@@ -225,6 +225,7 @@ const MenteeNonhabitual = () => {
                                             </Grid>
                                         </Grid>
                                     </Item2>
+                                    
                                     <Item2 sx={{ boxShadow: 2 }}>
                                         <Grid container spacing={2}>
                                         <Grid item xs={9}>
@@ -268,13 +269,21 @@ const MenteeNonhabitual = () => {
                                                     </Typography>
                                                 </Item2>
                                             </Grid>
-                                            <Grid item xs={2}>
+                                            <Grid item xs={2} >
                                                 <Item2>
-                                                    <Typography variant="h5" sx={{ color: 'black', textAlign: 'center', marginBottom: '20px' }}>
+                                                    <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
                                                         Date Given
                                                     </Typography>
                                                     <Typography variant="h6" alignItems='center' sx={{ alignItems:'center', textAlign: 'center' }}>
                                                         10 July 2022
+                                                    </Typography>
+                                                </Item2>
+                                                <Item2>
+                                                    <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
+                                                        From
+                                                    </Typography>
+                                                    <Typography variant="h6" alignItems='center' sx={{ alignItems:'center', textAlign: 'center' }}>
+                                                        Zulfathi Imran
                                                     </Typography>
                                                 </Item2>
                                             </Grid>
@@ -287,6 +296,7 @@ const MenteeNonhabitual = () => {
                                             </Grid>
                                         </Grid>
                                     </Item2>
+                                
                                 </Stack>
                             </Item2>
                         </Grid>
