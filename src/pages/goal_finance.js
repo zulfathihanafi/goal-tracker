@@ -152,7 +152,9 @@ const Finance = () => {
 
 
 
-    const addTransactionDialog = (<Dialog open={open} onClose={handleClose} fullWidth="xl">
+    const addTransactionDialog = (
+    
+    <Dialog open={open} onClose={handleClose} fullWidth="xl">
 
         <DialogTitle style={{ fontSize: "30px" }}>Add New Transaction</DialogTitle>
         <FormControl>

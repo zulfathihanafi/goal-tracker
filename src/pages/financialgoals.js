@@ -35,7 +35,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import FinancialGoalPost from "../components/financialGoalPost";
-
+import moment from 'moment';
 
 
 
@@ -51,15 +51,14 @@ const theme = createTheme({
 const Financialgoals = () => {
 
     const [newFinanceGoal, setNewFinanceGoal] = React.useState({
-        title: "",
+        Title: "",
         target: 0,
         current: 0,
-        percentage: 0,
+        currentPercentage: 0,
         dueDate: '',
-        transactions: [
-            { details: '', amount: 0, type: '', date: "" }]
+        
     })
-    const [openFinance, setOpenFinance] = React.useState(false);
+    const [openAddGoal, setOpenAddGoal] = React.useState(false);
     const [openWork, setOpenWork] = React.useState(false);
     const [workDrop, setWorkDrop] = React.useState(true)
     const [financialDrop, setFinancialDrop] = React.useState(true)
@@ -95,34 +94,46 @@ const Financialgoals = () => {
     }
 
     function addFinanceGoal() {
-        setOpenFinance(false)
-        navigate(`/goal3/0`)
-        alert("Please add your transaction in the goal page.")
-        var currentWork = financial
-        currentWork.unshift(newFinanceGoal)
-        financial = currentWork
-        console.log(work)
 
-
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').doc()
+        console.log(newFinanceGoal)
+        dbRef.set({
+            Title : newFinanceGoal.Title,
+            current : 0,
+            currentPercentage : 0,
+            dueDate : newFinanceGoal.dueDate,
+            target : newFinanceGoal.target
+        }).then(()=>{
+            console.log("get Id"+dbRef.id)
+            setOpenAddGoal(false)
+            navigate(`/goal3/${user.email}/${dbRef.id}`)
+            alert("Please add your transaction in the goal page.")
+        
         setNewFinanceGoal({
-            title: "",
+            Title: "",
             target: 0,
             current: 0,
-            percentage: 0,
-            dueDate: '',
-            transactions: [
-                { details: '', amount: 0, type: '', date: "" }]
+            currentPercentage: 0,
+            dueDate: ''
+        })
+        })
+
+
+        setOpenAddGoal(false)
+        //navigate(`/goal3/0`)
+        
+        
+        setNewFinanceGoal({
+            Title: "",
+            target: 0,
+            current: 0,
+            currentPercentage: 0,
+            dueDate: ''
         })
     }
-
-    return (
-        <ThemeProvider theme={theme}>
-            <body class="homeBody">
-                <div class="container home">
-                    <Button variant="contained" color="primary" size="large" Click={e => { setOpenWork(true) }} style={{ marginTop: '30px', marginBottom: "20px" }}>
-                        Add Work
-                    </Button>
-                    <Dialog open={openFinance} onClose={e => { setOpenFinance(false) }} fullWidth="xl">
+    
+    const addWorkDialog = (
+        <Dialog open={openAddGoal} onClose={e => { setOpenAddGoal(false) }} fullWidth="xl">
                         <DialogTitle style={{ fontSize: "30px" }}>Add New Finance Goal</DialogTitle>
                         <FormControl>
                             <DialogContent>
@@ -137,7 +148,7 @@ const Financialgoals = () => {
                                     type="title"
                                     fullWidth
                                     variant="standard"
-                                    onChange={e => { newFinanceGoal.title = e.target.value }}
+                                    onChange={e => { newFinanceGoal.Title = e.target.value }}
                                 />
                                 <DialogContentText style={{ fontWeight: 'bold' }}>
                                     Target
@@ -158,15 +169,27 @@ const Financialgoals = () => {
                                 <input
                                     type="date" id="birthdaytime"
                                     name="birthdaytime"
-                                    onChange={e => { newFinanceGoal.dueDate = e.target.value }}></input>
+                                    onChange={e => { newFinanceGoal.dueDate = moment(e.target.value).format("ll"); }}></input>
                             </DialogContent>
                         </FormControl>
                         <DialogActions>
-                            <Button onClick={e => setOpenFinance(false)}>Cancel</Button>
+                            <Button onClick={e => setOpenAddGoal(false)}>Cancel</Button>
                             <Button onClick={e => addFinanceGoal()}>Add</Button>
-
                         </DialogActions>
                     </Dialog>
+    )
+
+    const test = (
+        <Button>Test part 2</Button>
+    )
+    return (
+        <ThemeProvider theme={theme}>
+            <body class="homeBody">
+                <div class="container home">
+                    <Button variant="contained" color="primary" size="large" onClick={e => { setOpenAddGoal(!openAddGoal) }} style={{ marginTop: '30px', marginBottom: "20px" }}>
+                        Add Goal
+                    </Button>
+                    {addWorkDialog}
                     {financialGoals.map((goal, index) => (
                         <FinancialGoalPost
                             goalData = {goal.post}
