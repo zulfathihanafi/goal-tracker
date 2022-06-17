@@ -29,6 +29,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { auth, db } from "../components/firebase";
 import { UserContext } from '../userContext'
 import WorkGoalPost from "../components/workGoalPost";
+import moment from 'moment';
 
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -67,50 +68,18 @@ const WorkGoals = () => {
     const [newWorkGoal, setNewWorkGoal] = React.useState({
         title: "",
         percentage: 0,
-        dueDate: '',
-        pendingTasks: [{ task: '', due: '' }],
-        finishedTasks: []
+        dueDate: ''
     })
 
     const [openWork, setOpenWork] = React.useState(false);
-    const [workDrop, setWorkDrop] = React.useState(true)
-    const [financialDrop, setFinancialDrop] = React.useState(true)
-    const [newTask, setNewTask] = React.useState([])
-
-    const [enableEdit, setEdit] = React.useState(true)
+    
 
     const [workGoals, setWorkGoals] = useState([]);
     let navigate = useNavigate()
-    function addTasks() {
 
-    }
 
-    function addWorkGoal() {
-        setOpenWork(false)
-        navigate(`/goal/0`)
-        alert("Please add your task in the goal page.")
-        var currentWork = work
-        currentWork.unshift(newWorkGoal)
-        work = currentWork
-        console.log(work)
-
-        setNewWorkGoal({
-            title: "",
-            percentage: 0,
-            dueDate: '',
-            pendingTasks: [{ task: '', due: '' }],
-            finishedTasks: []
-        })
-    }
-
-    return (
-        <ThemeProvider theme={theme}>
-            <body class="homeBody">
-                <div class="container home">
-                    <Button variant="contained" size="large" Click={e => { setOpenWork(true) }} style={{ marginTop: '30px', marginBottom: "20px" }}>
-                        Add Work
-                    </Button>
-                    <Dialog open={openWork} onClose={e => { setOpenWork(false) }} fullWidth="xl">
+    const addGoalDialog = (
+        <Dialog open={openWork} onClose={e => { setOpenWork(false) }} fullWidth="xl">
                         <DialogTitle style={{ fontSize: "30px" }}>Add New Work Goal</DialogTitle>
                         <FormControl>
                             <DialogContent>
@@ -135,7 +104,7 @@ const WorkGoals = () => {
                                     type="date"
                                     id="birthdaytime"
                                     name="birthdaytime"
-                                    onChange={e => { newWorkGoal.dueDate = e.target.value }}>
+                                    onChange={e => { newWorkGoal.dueDate = moment(e.target.value).format("ll"); }}>
 
                                 </input>
 
@@ -146,7 +115,40 @@ const WorkGoals = () => {
                             <Button onClick={e => addWorkGoal()}>Add</Button>
                         </DialogActions>
                     </Dialog>
+    )
+    function addTasks() {
 
+    }
+
+    function addWorkGoal() {
+
+
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Work').collection('WorkGoals')
+        
+        dbRef.doc().set({
+            title : newWorkGoal.title,
+            percentage : 0,
+            dueDate : newWorkGoal.dueDate,  
+        })
+
+        setNewWorkGoal({
+            title: "",
+            percentage: 0,
+            dueDate: '',
+        })
+
+        setOpenWork(false)
+    }
+
+    return (
+        <ThemeProvider theme={theme}>
+            <body class="homeBody">
+                <div class="container home">
+                    <Button variant="contained" size="large" onClick={e => { setOpenWork(true) }} style={{ marginTop: '30px', marginBottom: "20px" }}>
+                        Add Work
+                    </Button>
+                    
+                {addGoalDialog}
                     {workGoals.map((goal, index) => (
                         <WorkGoalPost 
                         goalData ={goal.post} 

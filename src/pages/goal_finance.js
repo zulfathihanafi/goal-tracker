@@ -81,8 +81,45 @@ const Finance = () => {
     const [transactions, setTransactions] = useState([])
     let navigate = useNavigate();
 
+
+    //edit purposes
+    const [currentEdit, setCurrentEdit] = useState('')
+    const [currentEditDetails, setCurrentEditDetails] = useState('')
+    const [currentEditAmount, setCurrentEditAmount] = useState('')
+    const [currentEditType, setCurrentEditType] = useState('')
+    const [currentEditDate, setCurrentEditDate] = useState('')
+
+    function saveCurrentEdit(){
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions').doc(currentEdit)
+        dbRef.update({
+            amount: Number(currentEditAmount),
+            date : currentEditDate,
+            details : currentEditDetails,
+            type :  currentEditType
+        })
+
+        setCurrentEdit('')
+        setCurrentEditAmount('')
+        setCurrentEditDate('')
+        setCurrentEditDetails('')
+        setCurrentEditType('')
+    }
+
+    function deleteCurrentEdit(){
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions').doc(currentEdit)
+        dbRef.delete()
+
+        setCurrentEdit('')
+        setCurrentEditAmount('')
+        setCurrentEditDate('')
+        setCurrentEditDetails('')
+        setCurrentEditType('')
+    }
+
     function deleteGoal() {
-        navigate('/home')
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id)
+        dbRef.delete()
+        navigate('/financialgoals')
     }
     
 
@@ -335,14 +372,16 @@ const Finance = () => {
                                         <thead>
                                             <tr>
                                                 <th scope="col" class="col-1">#</th>
-                                                <th scope="col" class="col-5">Transaction Details</th>
+                                                <th scope="col" class="col-4">Transaction Details</th>
                                                 <th scope="col" class="col-2">Amount</th>
                                                 <th scope="col" class="col-2">Type</th>
                                                 <th scope="col" class="col-2">Date</th>
+                                                <th scope="col" class="col-2">Edit</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                         {transactions.map((transaction, index) => (
+                                            transaction.id != currentEdit ?(
                                                 <tr>
                                                     <th scope="row">
                                                         {index + 1}
@@ -359,7 +398,60 @@ const Finance = () => {
                                                     </td>
                                                     <td><strong>{transaction.transaction.type}</strong></td>
                                                     <td>{transaction.transaction.date}</td>
+                                                    <td><Button variant="contained" startIcon={<EditIcon />} sx={{ width: '10px' }} 
+                                                        onClick={e => { setCurrentEdit(transaction.id); 
+                                                                        setCurrentEditAmount(transaction.transaction.amount);
+                                                                        setCurrentEditDetails(transaction.transaction.details)
+                                                                        setCurrentEditType(transaction.transaction.type)
+                                                                        setCurrentEditDate(transaction.transaction.date)
+                                                                        console.log("transaction id "+transaction.id)
+
+                                                        }}/>
+                                                    
+                                                    </td>
+                                                </tr>):(
+                                                    <tr>
+                                                    <th scope="row">
+                                                        {index + 1}
+                                                    </th>
+                                                    <td>
+                                                        <Input defaultValue={transaction.transaction.details} onChange={e => { setCurrentEditDetails(e.target.value) }} />
+                                                    </td>
+                                                    <td>
+                                                        <Input defaultValue={transaction.transaction.amount} onChange={e => { setCurrentEditAmount(Number(e.target.value)) }} />
+                                                    </td>
+                                                    <td><strong>
+                                                        <TextField
+                                                            id="outlined-select"
+                                                            select
+                                                            defaultValue ={transaction.transaction.type}
+                                                            onChange={e=>{setCurrentEditType(e.target.value)}}
+                                                            sx={{ height: '1' }}
+                                                        >
+                                                            
+                                                                <MenuItem key="credit" value="Credit">
+                                                                    Credit
+                                                                </MenuItem>
+                                                                <MenuItem key="debit" value="Debit">
+                                                                    Debit
+                                                                </MenuItem>
+                                                            
+                                                        </TextField>
+                                                    </strong></td>
+                                                    <td>{transaction.transaction.date}</td>
+                                                    <td>
+                                                                    <td>
+                                                                        <Button variant="contained" sx={{ width: '1' }} startIcon={<CheckCircleIcon />} color="success" onClick={e => { saveCurrentEdit() }} />
+                                                                    </td>
+                                                                    <td>
+                                                                        <Button variant="contained" color="error" sx={{ width: '1' }} startIcon={<DeleteIcon />} onClick={e => { deleteCurrentEdit() }} />
+                                                                    </td>
+
+
+                                                    </td>
                                                 </tr>
+
+                                                )
                                             ))}
 {/*                                             
                                             {!editable ? transactions.map((transaction, index) => (
@@ -400,10 +492,10 @@ const Finance = () => {
                                                             
                                                         >
                                                             
-                                                                <MenuItem key="credit" value="credit">
+                                                                <MenuItem key="credit" value="Credit">
                                                                     Credit
                                                                 </MenuItem>
-                                                                <MenuItem key="debit" value="debit">
+                                                                <MenuItem key="debit" value="Debit">
                                                                     Debit
                                                                 </MenuItem>
                                                             
@@ -415,14 +507,11 @@ const Finance = () => {
                                              */}
                                         </tbody>
                                     </table>                 
-                                    {editable ? <input type="button" value="Save Goal" onClick={e => { setEditable(!editable) }} /> : <div></div>}
+                                    
 
                                     <Box display="flex" justifyContent='flex-end' alignItems='center' sx={{ marginTop: "10px" }}>
-                                        <Button variant="contained" startIcon={<EditIcon />} onClick={e => { setEditable(!editable) }} sx={{ marginTop: "10px" }}>
-                                            Edit
-                                        </Button>
                                         <Button variant="contained" color="error" sx={{ marginLeft: '10px', marginTop: "10px" }} startIcon={<DeleteIcon />} onClick={e => { deleteGoal() }}>
-                                            Delete
+                                            Delete Goal
                                         </Button>
                                     </Box>
 

@@ -42,7 +42,7 @@ const WorkGoalPost = ({goalData,id,email}) => {
     const [tasks, setTasks] = useState([])
     
     useEffect(() => {
-        var dbRef = db.collection('users').doc(email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('tasks')
+        var dbRef = db.collection('users').doc(email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('tasks').where("status","==","pending")
         dbRef.onSnapshot(snapshot => {
             setTasks(snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -107,7 +107,7 @@ const WorkGoalPost = ({goalData,id,email}) => {
                                                             </thead>
                                                             <tbody>
                                                                 {tasks.map((activity, index) => (
-                                                                    activity.task.status == "pending" ? (
+                                                                    
                                                                         <tr>
                                                                         <th scope="row">
                                                                             {index + 1}
@@ -115,7 +115,7 @@ const WorkGoalPost = ({goalData,id,email}) => {
                                                                         <td>{activity.task.task}</td>
                                                                         <td>{activity.task.due}</td>
                                                                     </tr>
-                                                                    ): undefined
+                                                                    
                                                                 ))}
                                                             </tbody>
                                                         </table>
