@@ -102,6 +102,7 @@ const Finance = () => {
     // for commenting purposes
     const [newComment, setNewComment] = useState('')
     const [comments, setComments] = useState([])
+    const [menteeName, setMenteeName] = useState('')
 
     function saveCurrentEdit() {
         var dbRef = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions').doc(currentEdit)
@@ -219,6 +220,27 @@ const Finance = () => {
             date: moment().format("ll"),
             mentor: user.displayName
         }).then(console.log("Success add comment")).catch(console.log("Cant add comment"))
+
+        //need to refer to mentor email
+        var dbRefComment = db.collection('users').doc(user.email).collection("Comments").doc()
+
+
+        db.collection('users').doc(email).get().then((doc)=>{
+            var data = doc.data()
+            dbRefComment.set({
+                menteeName : data.displayName,
+                comment: newComment,
+                date: moment().format("ll"),
+                mentor: user.displayName,
+                title : goalData.Title,
+                emailGoal : email,
+                goalID : id,
+                goalType : 'Financial'
+            })
+            
+        })
+
+
 
         setNewComment('')
     }

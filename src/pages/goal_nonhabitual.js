@@ -222,6 +222,26 @@ const Nonhabitual = () => {
             mentor: user.displayName
         }).then(console.log("Success add comment")).catch(console.log("Cant add comment"))
 
+
+        //need to refer to mentor email
+        var dbRefComment = db.collection('users').doc(user.email).collection("Comments").doc()
+
+
+        db.collection('users').doc(email).get().then((doc)=>{
+            var data = doc.data()
+            dbRefComment.set({
+                menteeName : data.displayName,
+                comment: newComment,
+                date: moment().format("ll"),
+                mentor: user.displayName,
+                title : goalData.title,
+                emailGoal : email,
+                goalID : id,
+                goalType : 'Work'
+            })
+            
+        })
+
         setNewComment('')
     }
 
