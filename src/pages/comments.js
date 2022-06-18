@@ -86,11 +86,11 @@ const Comments = () => {
                             <Item2 sx={{ boxShadow: 2 }}>
                                 <Grid container spacing={2}>
                                     <Grid item xs={2}>
-                                        <Item2 sx={{ height: '100%' }}>
-                                            <Box display="flex" justifyContent='center' alignItems='center' sx={{ marginTop: "10px" }}>
-                                                <Avatar sx={{ width: "50px", height: "50px", backgroundColor: 'blue' }}>FI</Avatar>
-                                            </Box>
-                                            <Typography variant="h6" sx={{ color: 'black', marginTop: '10px' }}>
+                                        <Item2 sx={{ height: '100%' }} class="border-end">
+                                        <Typography variant="h6" sx={{ color: 'black', textAlign: 'center' }}>
+                                                Mentee Name
+                                            </Typography>
+                                            <Typography alignItems='center' sx={{ textAlign: 'center' }}>
                                                 {comment.comment.menteeName}
                                             </Typography>
                                         </Item2>

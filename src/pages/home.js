@@ -321,6 +321,7 @@ const Home = () => {
                     </Grid>
 
                 </div>
+            
             </ThemeProvider>
         )
     } else {

@@ -80,7 +80,7 @@ const Nonhabitual = () => {
     // for commenting purposes
     const [newComment, setNewComment] = useState('')
     const [comments, setComments] = useState([])
-    
+    const [newCommentID, setNewCommentID] = useState('')
 
 
     useEffect(() => {
@@ -133,8 +133,18 @@ const Nonhabitual = () => {
 
             ));
         })
-        console.log("Comment in data" + comments)
 
+        if(user.email == email){ // if the email of the current User (mentee) equal to mentee email (from url)
+            comments.forEach(comment => {
+
+                var ref = db.collection('users').doc(comment.comment.mentorEmail).collection("Comments").doc(comment.id)
+                ref.update({
+                    status : 'read'
+                })
+                
+            });
+        }
+        
     }, [goalData])
 
 
@@ -219,28 +229,35 @@ const Nonhabitual = () => {
         dbRef.set({
             comment: newComment,
             date: moment().format("ll"),
-            mentor: user.displayName
-        }).then(console.log("Success add comment")).catch(console.log("Cant add comment"))
+            mentor: user.displayName,
+            mentorEmail : user.email
+        }).then(()=>{
+            
+            var dbRefComment = db.collection('users').doc(user.email).collection("Comments")
+
+
+            db.collection('users').doc(email).get().then((doc)=>{
+                var data = doc.data()
+                dbRefComment.doc(dbRef.id).set({
+                    menteeName : data.displayName,
+                    comment: newComment,
+                    date: moment().format("ll"),
+                    mentor: user.displayName,
+                    title : goalData.title,
+                    emailGoal : email,
+                    goalID : id,
+                    goalType : 'Work',
+                    status : "unread"
+                })
+                
+            })
+        
+        
+        })
 
 
         //need to refer to mentor email
-        var dbRefComment = db.collection('users').doc(user.email).collection("Comments").doc()
-
-
-        db.collection('users').doc(email).get().then((doc)=>{
-            var data = doc.data()
-            dbRefComment.set({
-                menteeName : data.displayName,
-                comment: newComment,
-                date: moment().format("ll"),
-                mentor: user.displayName,
-                title : goalData.title,
-                emailGoal : email,
-                goalID : id,
-                goalType : 'Work'
-            })
-            
-        })
+        
 
         setNewComment('')
     }

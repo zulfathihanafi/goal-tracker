@@ -62,11 +62,25 @@ const MenteeCard = ({ menteeData }) => {
         color: theme.palette.text.secondary,
         boxShadow: 'none',
     }));
+    const [financialSize, setFinancialSize] = useState(0)
+    const [workSize, setWorkSize] = useState(0)
+    useEffect(() => {
+        var dbRef = db.collection('users').doc(menteeData.id).collection("Goals").doc('Financial').collection('FinancialGoals')
+        dbRef.get().then(snap => {
+            setFinancialSize(snap.size) // will return the collection size
+          });
+        var dbRefWork = db.collection('users').doc(menteeData.id).collection("Goals").doc('Work').collection('WorkGoals')
+        dbRefWork.get().then(snap => {
+            setWorkSize(snap.size) // will return the collection size
+          });
+
+        console.log(workSize)
+    }, [])
     return (
         <Grid item xs={3}>
-            <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main' }}>
+            <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main', marginBottom :'20px' }}>
                 <Box display="flex" justifyContent='center' alignItems='center' sx={{ marginTop: "10px" }}>
-                    <Avatar sx={{ width: "80px", height: "80px", bgcolor: deepPurple[500] }}>M1</Avatar>
+                    <Avatar src={menteeData.data.imageUrl} sx={{ width: "80px", height: "80px", bgcolor: deepPurple[500] }} />
                 </Box>
                 <Typography variant="h5" sx={{ marginTop: "20px", color: "black" }}>
                     {menteeData.data.displayName}
@@ -75,12 +89,12 @@ const MenteeCard = ({ menteeData }) => {
                     <Item2>
                         <Typography variant="h6">
 
-                            3 <br></br>completed
+                            {workSize} <br></br>Work
                         </Typography>
                     </Item2>
                     <Item2>
                         <Typography variant="h6">
-                            12 <br></br> incomplete
+                            {financialSize} <br></br> Financial
                         </Typography>
                     </Item2>
                 </Stack>

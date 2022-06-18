@@ -15,7 +15,7 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 
 import '../styles/homementor.css'
-
+import { Link } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import { deepPurple } from '@mui/material/colors';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -34,23 +34,37 @@ const HomeMentor = () => {
     const { user, setUser } = useContext(UserContext);
     const [userRole, setUserRole] = useState('')
     const [mentees, setMentees] = useState([]);
+    const [currentWork, setCurrentWork] = useState(0)
+    const [currentFinancial, setCurrentFinancial] = useState(0)
+    const [numberComment, setNumberComment] = useState(0)
+    const [numberReadComment, setNumberReadComment] = useState(0)
     useEffect(() => {
         console.log("Home context " + user.email)
-        
+
 
         db.collection("users").doc(user.email).get().then((doc) => {
             var data = doc.data()
             setUserRole(data.role)
         })
 
-        var dbRef = db.collection('users').where("role","==","Mentee")
+        var dbRef = db.collection('users').where("role", "==", "Mentee")
         dbRef.onSnapshot(snapshot => {
             setMentees(snapshot.docs.map(doc => ({
                 id: doc.id,
                 data: doc.data(),
-                
+
             })));
         })
+
+        var dbRefComment = db.collection('users').doc(user.email).collection("Comments")
+        dbRefComment.get().then(snap => {
+            setNumberComment(snap.size) // will return the collection size
+        });
+
+        var dbRefReadComment = db.collection('users').doc(user.email).collection("Comments").where("status", "==", "read")
+        dbRefReadComment.get().then(snap => {
+            setNumberReadComment(snap.size) // will return the collection size
+        });
 
 
     }, [user]);
@@ -88,7 +102,7 @@ const HomeMentor = () => {
                 <body class="homebody">
                     <div class="container home" style={{ paddingTop: '20px' }}>
                         <Typography variant="h3" sx={{ textAlign: 'center' }}>
-                            Welcome back, Fathi!
+                            Welcome back, {user.displayName}!
                         </Typography>
 
                         <Grid container spacing={1} sx={{ marginTop: '20px' }}>
@@ -102,22 +116,13 @@ const HomeMentor = () => {
                                         <Item2>
                                             <FaceIcon color="primary" fontSize="large" sx={{ width: 70, height: 70, marginBottom: '20px' }} />
                                             <Typography variant="h5">
-                                                20<br></br>Active Mentee
-                                            </Typography>
-                                        </Item2>
-                                        <Item2>
-                                            <CheckCircleIcon color="success" fontSize="large" sx={{ width: 70, height: 70, marginBottom: '20px' }} />
-                                            <Typography variant="h5">
-                                                101<br></br>Completed Goals
-                                            </Typography>
-                                        </Item2>
-                                        <Item2>
-                                            <HighlightOffIcon color="error" fontSize="large" sx={{ width: 70, height: 70, marginBottom: '20px' }} />
-                                            <Typography variant="h5">
-                                                365<br></br>Incomplete Goals
+                                                {mentees.length}<br></br>Active Mentee
                                             </Typography>
                                         </Item2>
                                     </Stack>
+                                    <Box display="flex" justifyContent='flex-end' alignItems='center' sx={{ marginTop: "10px", marginRight: '20px', marginBottom: '10px' }}>
+                                        <br />
+                                    </Box>
                                 </Item>
                             </Grid>
                             <Grid item xs={6}>
@@ -127,55 +132,30 @@ const HomeMentor = () => {
                                         <ForumIcon fontSize="large" sx={{ width: 40, height: 40, marginLeft: '20px' }} />
                                     </Typography>
                                     <Grid container spacing="1">
-                                        <Grid item2 xs={4}>
-                                            <Item2>
-                                                <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                                                    <CircularProgress style={{ 'position': 'absolute', 'color': '#c0c0c0' }} variant="determinate" size={70} thickness={5} value={100} />
-                                                    <CircularProgress style={{ 'color': 'blue' }} variant="determinate" size={70} thickness={5} value={40} />
-                                                    <Box
-                                                        sx={{
-                                                            top: 0,
-                                                            left: 0,
-                                                            bottom: 0,
-                                                            right: 0,
-                                                            position: 'absolute',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                        }}
-                                                    >
-                                                        <Typography variant="h6" component="div" color="text.secondary">
-                                                            40%
-                                                        </Typography>
-                                                    </Box>
-                                                </Box>
-                                                <Typography variant="h5" sx={{ marginTop: '20px' }}>
-                                                    Response percentage
-                                                </Typography>
-                                            </Item2>
-                                        </Grid>
-                                        <Grid item2 xs={4}>
+                                        <Grid item2 xs={6}>
                                             <Item2 justifyContent="flex-start" alignItems="flex-start">
                                                 <DriveFileRenameOutlineIcon color="primary" fontSize="large" sx={{ width: 70, height: 70, marginBottom: '20px', marginRight: '20px' }} />
                                                 <Typography variant="h5">
-                                                    24 Comments Given
+                                                    {numberComment} Comments Given
                                                 </Typography>
                                             </Item2>
                                         </Grid>
-                                        <Grid item2 xs={4}>
+                                        <Grid item2 xs={6}>
                                             <Item2>
                                                 <CheckCircleIcon color="success" fontSize="large" sx={{ width: 70, height: 70, marginBottom: '20px', marginRight: '20px' }} />
                                                 <Typography variant="h5">
-                                                    6 Comments Accepted
+                                                    {numberReadComment} Comments Read
                                                 </Typography>
                                             </Item2>
                                         </Grid>
+                                        <Box display="flex" justifyContent='flex-end' alignItems='center' sx={{ marginTop: "10px", marginRight: '20px', marginBottom: '10px', width: '100%' }}>
+                                            <Link to={`/comments`} class="link">
+                                                <Button color="primary" variant="contained" >
+                                                    Check All Comments
+                                                </Button>
+                                            </Link>
+                                        </Box>
                                     </Grid>
-                                    <Box display="flex" justifyContent='flex-end' alignItems='center' sx={{ marginTop: "10px", marginRight: '20px', marginBottom: '10px' }}>
-                                        <Button color="primary" variant="contained" >
-                                            Check All Comments
-                                        </Button>
-                                    </Box>
                                 </Item>
                             </Grid>
                         </Grid>
@@ -183,13 +163,13 @@ const HomeMentor = () => {
                             Mentee List
                             <PeopleIcon fontSize="large" sx={{ width: 40, height: 40, marginLeft: '20px', marginBottom: '10px' }} />
                         </Typography>
-                        
+
                         <Grid container spacing={2}>
-                        {mentees.map((mentee, index) => (
-                        <MenteeCard menteeData = {mentee}/>
-                        
-                    )) }
-                            
+                            {mentees.map((mentee, index) => (
+                                <MenteeCard menteeData={mentee} />
+
+                            ))}
+
                         </Grid>
                     </div>
                     <div >
