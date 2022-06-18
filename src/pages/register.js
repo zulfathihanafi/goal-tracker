@@ -102,8 +102,8 @@ const Register = () => {
                     displayName: registerUser.name,
                     phoneNumber: registerUser.phone,
                     role: registerUser.role,
-                    occupation: registerUser.occupation
-                    
+                    occupation: registerUser.occupation,
+                    imageUrl : ''
                 })
                 setUserRole(registerUser.role)
             })

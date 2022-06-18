@@ -1,7 +1,7 @@
 import logo from "../logo192.png";
 import { auth, db } from "../components/firebase";
 import { UserContext } from '../userContext'
-import { useState, useEffect,useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Container from '@mui/material/Container'
@@ -102,6 +102,7 @@ const Item = styled(Paper)(({ theme }) => ({
     padding: theme.spacing(1),
     textAlign: 'center',
     color: theme.palette.text.secondary,
+    borderRadius: "10px"
 }));
 
 const Item2 = styled(Paper)(({ theme }) => ({
@@ -112,6 +113,7 @@ const Item2 = styled(Paper)(({ theme }) => ({
     color: theme.palette.text.secondary,
     borderRadius: 0,
     boxShadow: 'none',
+    borderRadius: "10px"
 }));
 
 const Item3 = styled(Paper)(({ theme }) => ({
@@ -121,27 +123,85 @@ const Item3 = styled(Paper)(({ theme }) => ({
     textAlign: 'center',
     color: theme.palette.text.secondary,
     boxShadow: 'none',
+    borderRadius: "10px"
 }));
 
 const Home = () => {
     // var userRole ="Mentee"
-    const {user,setUser} = useContext(UserContext);
-    
-    const [userData,setUserData] = useState({ name: '', email: '',occupation:'', phone: '' })
-    const [userRole,setUserRole] = useState('')
+    const { user, setUser } = useContext(UserContext);
+
+    const [userData, setUserData] = useState({ name: '', email: '', occupation: '', phone: '',imageUrl :'' })
+    const [userRole, setUserRole] = useState('')
+
+    const [financialGoals, setFinancialGoals] = useState([])
+    const [workGoals, setWorkGoals] = useState([])
+
+    const [workNames, setWorkNames] = useState([])
+    const [financialNames, setFinancialNames] = useState([])
+    const [workPercentages, setWorkPercentages] = useState([])
+    const [financialPercentages, setFinancialPercentages] = useState([])
+    const [workDatas, setWorkDatas] = useState()
+
+
     useEffect(() => {
-        console.log("Home context "+user.email)
-        
+        console.log("Home context " + user.email)
+
 
         db.collection("users").doc(user.email).get().then((doc) => {
             var data = doc.data()
-            setUserData({ name: data.displayName, email: user.email,occupation:data.occupation, phone: data.phoneNumber })
+            setUserData({ name: data.displayName, email: user.email, occupation: data.occupation, phone: data.phoneNumber, imageUrl:data.imageUrl })
             setUserRole(data.role)
-          })
-          
-          
-      }, [user]);
+        })
 
+        // var dbRefFinancial = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals')
+        // dbRefFinancial.onSnapshot(snapshot => {
+        //     setFinancialGoals(snapshot.docs.map(doc => ({
+        //         id: doc.id,
+        //         name: doc.data().Title,
+        //         percentage : doc.data().currentPercentage
+        //     })));
+        // })
+        
+
+        // var dbRefWork = db.collection('users').doc(user.email).collection("Goals").doc('Work').collection('WorkGoals')
+        // dbRefWork.onSnapshot(snapshot => {
+        //     setWorkGoals(snapshot.docs.map(doc => ({
+        //         id: doc.id,
+        //         name: doc.data().title,
+        //         percentage : doc.data().percentage
+        //     })));
+        // })
+
+        
+
+    }, []);
+
+    useEffect(() => {
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals')
+        dbRef.onSnapshot(snapshot => {
+            setFinancialGoals(snapshot.docs.map(doc => ({
+                id: doc.id,
+                name: doc.data().Title,
+                percentage : doc.data().currentPercentage
+            })));
+            setFinancialNames(financialGoals.map(({ name }) => name))
+            setFinancialPercentages(financialGoals.map(({ percentage }) => percentage))
+        });
+
+        var dbRef2 = db.collection('users').doc(user.email).collection("Goals").doc('Work').collection('WorkGoals')
+        dbRef2.onSnapshot(snapshot => {
+            setWorkGoals(snapshot.docs.map(doc => ({
+                id: doc.id,
+                name: doc.data().title,
+                percentage : doc.data().percentage
+            })));
+
+            
+            
+        })
+        setWorkNames(workGoals.map(({ name }) => name))
+        console.log(workNames)
+    }, [userRole])
 
 
 
@@ -160,220 +220,101 @@ const Home = () => {
                 text: 'Goals Completion Percentage',
             },
         },
+        scales: {
+            x: { // defining min and max so hiding the dataset does not change scale range
+              min: 0,
+              max: 100
+            }
+          }
     };
-
-    const labels = ['Goal 1', 'Goal 2', 'Goal 3', 'Goal 4', 'Goal 5', 'Goal 6'];
-    const perc = [30, 60, 70, 10, 100, 40, 80];
-
-    const data = {
-        labels,
-        datasets: [
-            {
-                label: 'Percentage %',
-                data: [30, 60, 70, 10, 100, 40, 80],
-                borderColor: 'rgb(255, 99, 132)',
-                backgroundColor: 'rgba(255, 99, 132, 0.5)',
-            },
-        ],
-    };
-
-    const [newWorkGoal, setNewWorkGoal] = React.useState({
-        title: "",
-        percentage: 0,
-        dueDate: '',
-        pendingTasks: [{ task: '', due: '' }],
-        finishedTasks: []
-    })
-    const [newFinanceGoal, setNewFinanceGoal] = React.useState({
-        title: "",
-        target: 0,
-        current: 0,
-        percentage: 0,
-        dueDate: '',
-        transactions: [
-            { details: '', amount: 0, type: '', date: "" }]
-    })
-    const [openFinance, setOpenFinance] = React.useState(false);
-    const [openWork, setOpenWork] = React.useState(false);
-    const [workDrop, setWorkDrop] = React.useState(true)
-    const [financialDrop, setFinancialDrop] = React.useState(true)
-    const [newTask, setNewTask] = React.useState([])
-
-    const [enableEdit, setEdit] = React.useState(true)
-    
-
-    let navigate = useNavigate()
-    
-
-    function addWorkGoal() {
-        setOpenWork(false)
-        navigate(`/goal/0`)
-        alert("Please add your task in the goal page.")
-        var currentWork = work
-        currentWork.unshift(newWorkGoal)
-        work = currentWork
-        console.log(work)
-
-        setNewWorkGoal({
-            title: "",
-            percentage: 0,
-            dueDate: '',
-            pendingTasks: [{ task: '', due: '' }],
-            finishedTasks: []
-        })
-    }
-
-    function addFinanceGoal() {
-        setOpenFinance(false)
-        navigate(`/goal3/0`)
-        alert("Please add your transaction in the goal page.")
-        var currentWork = financial
-        currentWork.unshift(newFinanceGoal)
-        financial = currentWork
-        console.log(work)
-
-
-        setNewFinanceGoal({
-            title: "",
-            target: 0,
-            current: 0,
-            percentage: 0,
-            dueDate: '',
-            transactions: [
-                { details: '', amount: 0, type: '', date: "" }]
-        })
-    }
-
 
     if (userRole == "Mentee") {
         return (
             <ThemeProvider theme={theme}>
                 <div class="homeBody" style={{ height: '100%', width: '100%' }}>
                     <Grid container spacing={2} justifyContent="flex-start" alignItems="flex-start" >
-                            <Grid item xs={3} style={{ marginTop: "40px", height: "100%" }}>
-                                <Item3 sx={{ height: '100%', backgroundColor: '#f7f6f6' }}>
-                                    <Box display='flex' justifyContent='center' alignItems='center'>
-                                        <Avatar src={zul} sx={{ width: '200px', height: '200px' }} />
+                        <Grid item xs={3} style={{ marginTop: "40px", height: "100%" }}>
+                            <Item3 sx={{ height: '100%', backgroundColor: '#f7f6f6' }}>
+                                <Box display='flex' justifyContent='center' alignItems='center'>
+                                    <Avatar src={userData.imageUrl == '' ? "https://www.pngall.com/wp-content/uploads/5/Profile-Avatar-PNG.png" : userData.imageUrl} sx={{ width: '200px', height: '200px' }} />
+                                </Box>
+
+                                {/* Profile content */}
+
+                                <Container sx={{ marginLeft: '60px', marginTop: '30px' }}>
+                                    <Typography variant="h5" sx={{ fontWeight: 'bold', textAlign: 'left' }}>{userData.name}</Typography>
+                                    <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><WorkIcon sx={{ marginRight: '10px' }} />{userData.occupation}</Typography>
+                                    <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><EmailIcon sx={{ marginRight: '10px' }} />{userData.email}</Typography>
+                                    <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><LocalPhoneIcon sx={{ marginRight: '10px' }} />{userData.phone}</Typography>
+                                    <Typography variant="h4" sx={{ marginTop: '70px', textAlign: 'left' }}>Ongoing Activities</Typography>
+                                    <Box display='flex' justifyContent='flex-start' alignItems='center' sx={{ backgroundColor: '#26a326', borderRadius: '16px', marginTop: '20px', width: '200px' }}>
+                                        <TrackChangesIcon sx={{ color: 'white', width: '50px', height: '50px', marginLeft: '10px', marginRight: '10px' }} />
+                                        <Typography sx={{ marginBottom: '20px', color: 'white' }}>Work Goals: {workGoals.length}</Typography>
                                     </Box>
+                                    <Box display='flex' justifyContent='flex-start' alignItems='center' sx={{ backgroundColor: '#c22370', borderRadius: '16px', marginTop: '20px', width: '200px' }}>
+                                        <MonetizationOnIcon sx={{ color: 'white', width: '50px', height: '50px', marginLeft: '10px', marginRight: '10px' }} />
+                                        <Typography sx={{ marginBottom: '20px', color: 'white' }}>Financial Goal: {financialGoals.length}</Typography>
+                                    </Box>
+                                </Container>
+                            </Item3>
+                        </Grid>
+                        <Grid item xs={9} style={{ paddingLeft : '5%'}}>
+                            <Item3 sx={{ height: '100%', marginTop: '40px',marginBottom:'40px', backgroundColor: '#f7f6f6' }}>
 
-                                    {/* Profile content */}
+                                <Grid >
+                                    <Grid item xs={9}>
+                                        <Item2>
+                                            <Typography variant="h4" textAlign="center" style={{ marginLeft: "10px" }}>Work Goal Progress</Typography>
+                                            {/* Progress Bar */}
+                                            <Bar options={options} 
+                                            data={{
+                                                labels : workGoals.map(({ name }) => name),
+                                                datasets: [
+                                                    {
+                                                        label: 'Percentage %',
+                                                        data: workGoals.map(({ percentage }) => percentage),
+                                                        // borderColor: 'rgb(255, 99, 132)',
+                                                        // backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                                        borderColor: '#04870f',
+                                                        backgroundColor: '#89f592',
+                                                    },
+                                                ],
+                                            }
+                                            } 
+                                            style={{ marginTop: "10px", marginBottom: "30px" }} />
 
-                                    <Container sx={{ marginLeft: '60px', marginTop: '30px' }}>
-                                        <Typography variant="h5" sx={{ fontWeight: 'bold', textAlign: 'left' }}>{userData.name}</Typography>
-                                        <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><WorkIcon sx={{ marginRight: '10px' }} />{userData.occupation}</Typography>
-                                        <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><EmailIcon sx={{ marginRight: '10px' }} />{userData.email}</Typography>
-                                        <Typography variant="h6" style={{ marginTop: '5px', textAlign: 'left' }}><LocalPhoneIcon sx={{ marginRight: '10px' }} />{userData.phone}</Typography>
-                                        <Typography variant="h4" sx={{ marginTop: '70px', textAlign: 'left' }}>Ongoing Activities</Typography>
-                                        <Box display='flex' justifyContent='flex-start' alignItems='center' sx={{ backgroundColor: '#26a326', borderRadius: '16px', marginTop: '20px', width: '200px' }}>
-                                            <TrackChangesIcon sx={{ color: 'white', width: '50px', height: '50px', marginLeft: '10px', marginRight: '10px' }} />
-                                            <Typography sx={{ marginBottom: '20px', color: 'white' }}>Work Goals: 3</Typography>
-                                        </Box>
-                                        <Box display='flex' justifyContent='flex-start' alignItems='center' sx={{ backgroundColor: '#c22370', borderRadius: '16px', marginTop: '20px', width: '200px' }}>
-                                            <MonetizationOnIcon sx={{ color: 'white', width: '50px', height: '50px', marginLeft: '10px', marginRight: '10px' }} />
-                                            <Typography sx={{ marginBottom: '20px', color: 'white' }}>Financial Goal: 4</Typography>
-                                        </Box>
-                                    </Container>
-                                </Item3>
-                            </Grid>
-                        <Grid item xs={9} >
-                            <Item3 sx={{ height: '100%', marginRight: '100px', marginTop: '40px', backgroundColor: '#f7f6f6' }}>
-                                <Grid container spacing={1}>
-                                    <Grid item xs={12}>
-                                        <Item2>
-                                            <Typography variant="h4" textAlign="center" style={{ marginLeft: "10px" }}>Current Progress</Typography>
-                                            <Bar options={options} data={data} style={{ marginTop: "10px", marginBottom: "30px" }} />
                                         </Item2>
+                                        
                                     </Grid>
-                                    <Grid item xs={6}>
+                                    
+                                </Grid>
+
+                                <Grid >
+                                    <Grid item xs={9} style={{marginTop:'20px'}}>
                                         <Item2>
-                                            <Typography variant="h5">
-                                                Work Goals Statistic
-                                            </Typography>
-                                            <Box sx={{ position: 'relative', display: 'inline-flex' }} style={{ marginTop: '30px' }}>
-                                                <CircularProgress style={{ 'position': 'absolute', 'color': '#d9d9d9' }} variant="determinate" size={100} thickness={7} value={100} />
-                                                <CircularProgress style={{ 'color': 'blue' }} variant="determinate" size={100} thickness={7} value={50} />
-                                                <Box
-                                                    sx={{
-                                                        top: 0,
-                                                        left: 0,
-                                                        bottom: 0,
-                                                        right: 0,
-                                                        position: 'absolute',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                    }}
-                                                >
-                                                    <Typography variant="h6" component="div" color="text.secondary">
-                                                        50%
-                                                    </Typography>
-                                                </Box>
-                                            </Box>
-                                            <Stack sx={{ marginTop: "20px" }} justifyContent='center' alignItems='baseline' direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-                                                <Item2 sx={{ borderRadius: '30px!important', color: "grey" }}>
-                                                    <Typography variant="h4" style={{ padding: "10px", marginTop: "10px", height: "100%", color: "black" }}>
-                                                        3 <br></br>
-                                                    </Typography>
-                                                    <Typography variant="h6" style={{ padding: "5px", height: "100%" }}>
-                                                        Completed goals
-                                                    </Typography>
-                                                </Item2>
-                                                <Item2 sx={{ borderRadius: '50px!important' }}>
-                                                    <Typography variant="h4" style={{ padding: "10px", marginTop: "10px", height: "100%", color: "black" }}>
-                                                        12 <br></br>
-                                                    </Typography>
-                                                    <Typography variant="h6" style={{ padding: "5px", height: "100%" }}>
-                                                        Incomplete goals
-                                                    </Typography>
-                                                </Item2>
-                                            </Stack>
+                                            <Typography variant="h4" textAlign="center" style={{ marginLeft: "10px" }}>Financial Goal Progress</Typography>
+                                            {/* Progress Bar */}
+                                            <Bar options={options} 
+                                            data={{
+                                                labels : financialGoals.map(({ name }) => name),
+                                                datasets: [
+                                                    {
+                                                        label: 'Percentage %',
+                                                        data: financialGoals.map(({ percentage }) => percentage),
+                                                        borderColor: 'rgb(255, 99, 132)',
+                                                        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                                                        // borderColor: '#04870f',
+                                                        // backgroundColor: '#89f592',
+                                                    },
+                                                ],
+                                            }
+                                            }  
+                                            style={{ marginTop: "10px", marginBottom: "30px" }} />
+
                                         </Item2>
+                                        
                                     </Grid>
-                                    <Grid item xs={6}>
-                                        <Item2>
-                                            <Typography variant="h5">
-                                                Financial Goals Statistic
-                                            </Typography>
-                                            <Box sx={{ position: 'relative', display: 'inline-flex' }} style={{ marginTop: '30px' }}>
-                                                <CircularProgress style={{ 'position': 'absolute', 'color': '#d9d9d9' }} variant="determinate" size={100} thickness={7} value={100} />
-                                                <CircularProgress style={{ 'color': 'blue' }} variant="determinate" size={100} thickness={7} value={70} />
-                                                <Box
-                                                    sx={{
-                                                        top: 0,
-                                                        left: 0,
-                                                        bottom: 0,
-                                                        right: 0,
-                                                        position: 'absolute',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center',
-                                                    }}
-                                                >
-                                                    <Typography variant="h6" component="div" color="text.secondary">
-                                                        70%
-                                                    </Typography>
-                                                </Box>
-                                            </Box>
-                                            <Stack sx={{ marginTop: "20px" }} justifyContent='center' alignItems='baseline' direction="row" spacing={2} divider={<Divider orientation="vertical" flexItem />}>
-                                                <Item2 sx={{ borderRadius: '50px!important', color: "grey" }}>
-                                                    <Typography variant="h4" style={{ padding: "10px", marginTop: "10px", height: "100%", color: "black" }}>
-                                                        3 <br></br>
-                                                    </Typography>
-                                                    <Typography variant="h6" style={{ padding: "5px", height: "100%" }}>
-                                                        Completed goals
-                                                    </Typography>
-                                                </Item2>
-                                                <Item2 sx={{ borderRadius: '50px!important' }}>
-                                                    <Typography variant="h4" style={{ padding: "10px", marginTop: "10px", height: "100%", color: "black" }}>
-                                                        12 <br></br>
-                                                    </Typography>
-                                                    <Typography variant="h6" style={{ padding: "5px", height: "100%" }}>
-                                                        Incomplete goals
-                                                    </Typography>
-                                                </Item2>
-                                            </Stack>
-                                        </Item2>
-                                    </Grid>
+                                    
                                 </Grid>
                             </Item3>
                         </Grid>
@@ -395,8 +336,8 @@ const Home = () => {
             >
                 <Grid item xs={3}>
                     <div>
-                    <Avatar className="App-logo" src={logo} sx={{ width: '200px', height: '200px' }} />
-                </div>
+                        <Avatar className="App-logo" src={logo} sx={{ width: '200px', height: '200px' }} />
+                    </div>
                 </Grid>
 
             </Grid>

@@ -13,6 +13,8 @@ import { UserContext } from '../userContext'
 
 const NavigationBar = () => {
     const { user, setUser, userRole, setUserRole } = useContext(UserContext);
+    const [imageUrl, setImageUrl] = useState('');
+
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((authUser) => {
             if (authUser) {
@@ -23,6 +25,7 @@ const NavigationBar = () => {
                 db.collection("users").doc(authUser.email).get().then((doc) => {
                     console.log("in register js " + doc.data().role)
                     setUserRole(doc.data().role)
+                    setImageUrl(doc.data().imageUrl)
                 })
 
             } else {
@@ -95,7 +98,7 @@ const NavigationBar = () => {
                             </div>
                             <Dropdown>
                                 <Dropdown.Toggle variant="success" id="dropdown-basic">
-                                    <img src={zul} width="30" height="30" alt="" style={{ marginRight: '10px' }} />
+                                    <img src={imageUrl == '' ? "https://www.pngall.com/wp-content/uploads/5/Profile-Avatar-PNG.png" : imageUrl} width="30" height="30" alt="" style={{ marginRight: '10px' }} />
                                 </Dropdown.Toggle>
 
                                 <Dropdown.Menu>
