@@ -76,7 +76,7 @@ const Financialgoals = () => {
     
     useEffect(() => {
         //where the code runs, cond after the comma
-        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals')
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Financial').collection('FinancialGoals').orderBy("timestamp","desc")
         dbRef.onSnapshot(snapshot => {
             setFinancialGoals(snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -102,7 +102,8 @@ const Financialgoals = () => {
             current : 0,
             currentPercentage : 0,
             dueDate : newFinanceGoal.dueDate,
-            target : newFinanceGoal.target
+            target : newFinanceGoal.target,
+            timestamp : Date.now()
         }).then(()=>{
             console.log("get Id"+dbRef.id)
             setOpenAddGoal(false)

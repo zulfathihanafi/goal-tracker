@@ -149,7 +149,7 @@ const Finance = () => {
 
     useEffect(() => {
         updateData()
-        var dbRefComments = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('comments')
+        var dbRefComments = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('comments').orderBy("timestamp","desc")
         dbRefComments.onSnapshot(snapshot => {
             setComments(snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -230,7 +230,8 @@ const Finance = () => {
             comment: newComment,
             date: moment().format("ll"),
             mentor: user.displayName,
-            mentorEmail : user.email
+            mentorEmail : user.email,
+                timastamp : Date.now()
         }).then(()=>{
             var dbRefComment = db.collection('users').doc(user.email).collection("Comments")
 
@@ -246,7 +247,8 @@ const Finance = () => {
                 emailGoal : email,
                 goalID : id,
                 goalType : 'Financial',
-                status : "unread"
+                status : "unread",
+                timastamp : Date.now()
             })
             
         })

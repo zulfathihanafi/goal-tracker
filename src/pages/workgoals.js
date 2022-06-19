@@ -52,7 +52,7 @@ const WorkGoals = () => {
 
     useEffect(() => {
         //where the code runs, cond after the comma
-        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Work').collection('WorkGoals')
+        var dbRef = db.collection('users').doc(user.email).collection("Goals").doc('Work').collection('WorkGoals').orderBy("timestamp","desc")
         dbRef.onSnapshot(snapshot => {
             setWorkGoals(snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -129,6 +129,7 @@ const WorkGoals = () => {
             title : newWorkGoal.title,
             percentage : 0,
             dueDate : newWorkGoal.dueDate,  
+            timestamp : Date.now()
         })
 
         setNewWorkGoal({

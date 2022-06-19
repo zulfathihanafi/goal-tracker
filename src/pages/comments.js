@@ -31,7 +31,7 @@ const Comments = () => {
     const { user, setUser } = useContext(UserContext);
 
     useEffect(() => {
-        var dbRefComments = db.collection('users').doc(user.email).collection("Comments")
+        var dbRefComments = db.collection('users').doc(user.email).collection("Comments").orderBy('timestamp',"desc")
         dbRefComments.onSnapshot(snapshot => {
             setComments(snapshot.docs.map(doc => ({
                 id: doc.id,

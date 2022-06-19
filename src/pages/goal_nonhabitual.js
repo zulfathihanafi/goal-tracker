@@ -123,7 +123,7 @@ const Nonhabitual = () => {
 
 
         //get New Comments
-        var dbRefComments = db.collection('users').doc(email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('comments')
+        var dbRefComments = db.collection('users').doc(email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('comments').orderBy("timestamp","desc")
         dbRefComments.onSnapshot(snapshot => {
             setComments(snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -230,7 +230,8 @@ const Nonhabitual = () => {
             comment: newComment,
             date: moment().format("ll"),
             mentor: user.displayName,
-            mentorEmail : user.email
+            mentorEmail : user.email,
+            timestamp : Date.now()
         }).then(()=>{
             
             var dbRefComment = db.collection('users').doc(user.email).collection("Comments")
@@ -247,7 +248,8 @@ const Nonhabitual = () => {
                     emailGoal : email,
                     goalID : id,
                     goalType : 'Work',
-                    status : "unread"
+                    status : "unread",
+                    timestamp : Date.now()
                 })
                 
             })
