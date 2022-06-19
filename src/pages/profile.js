@@ -82,7 +82,7 @@ const Profile = () => {
 
         db.collection("users").doc(user.email).get().then((doc) => {
             var data = doc.data()
-
+            
             setUserName(data.displayName)
             setUserEmail(user.email)
             setUserOccupation(data.occupation)

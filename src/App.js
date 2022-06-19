@@ -1,10 +1,7 @@
 import { UserContext } from './userContext'
 import 'bootstrap/dist/css/bootstrap.css';
-import $ from 'jquery';
-import Popper from 'popper.js';
 import 'jquery/dist/jquery.min.js'
 import 'bootstrap/dist/js/bootstrap.min.js'
-import logo from './logo.svg';
 import './App.css';
 import Register from './pages/register';
 import Nonhabitual from './pages/goal_nonhabitual';
@@ -17,8 +14,7 @@ import FinancialGoals from './pages/financialgoals';
 import HomeMentor from './pages/homementor';
 import MenteeProfile from './pages/menteeprofile';
 import Comments from './pages/comments';
-import MenteeNonhabitual from './pages/menteegoal_nonhabitual';
-import { financial, work } from './data/goals';
+
 import {
   BrowserRouter as Router,
   Routes,
@@ -27,8 +23,6 @@ import {
 } from 'react-router-dom';
 import React, { Component, useEffect, useState, useContext, useReducer } from 'react';
 import { auth, db } from './components/firebase';
-import { Navigate, useNavigate } from 'react-router-dom';
-
 
 function App() {
 
@@ -91,7 +85,7 @@ function App() {
 
             <Route exact path='/menteeprofile/:id' element={<MenteeProfile />} />
             <Route exact path='/comments' element={<Comments />} />
-            <Route exact path='/menteenonhabitual' element={<MenteeNonhabitual />} />
+           
           
         </Routes>:
         <Routes>

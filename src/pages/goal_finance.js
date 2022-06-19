@@ -134,6 +134,16 @@ const Finance = () => {
     function deleteGoal() {
         var dbRef = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id)
         dbRef.delete()
+
+        // to delete comments
+        // var dbRefComment = db.collection('users').doc(email).collection("Comments").where("goalID","==",id)
+        // console.log("Delete comment id "+id)
+        // dbRefComment.get().then((snap)=>{
+        //     snap.forEach((doc)=>{
+        //         doc.ref.delete()
+        //     })
+        // })
+        
         navigate('/financialgoals')
     }
 

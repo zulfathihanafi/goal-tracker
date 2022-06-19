@@ -4,9 +4,6 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { auth, db } from "../components/firebase";
 import "../styles/register.css";
 import logo from './logo2.jpg';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 
 const Register = () => {
     const {user,setUser,userRole,setUserRole} = useContext(UserContext);

@@ -9,47 +9,10 @@ import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper';
 import WorkIcon from '@mui/icons-material/Work';
-import PropTypes from 'prop-types';
-import CircularProgress from '@mui/material/CircularProgress';
-import LinearProgress from '@mui/material/LinearProgress';
-import CurrencyExchangeIcon from '@mui/icons-material/CurrencyExchange';
 import Box from '@mui/material/Box';
-import Backdrop from '@mui/material/Backdrop';
-import SpeedDial from '@mui/material/SpeedDial';
-import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import SpeedDialAction from '@mui/material/SpeedDialAction';
-import FileCopyIcon from '@mui/icons-material/FileCopyOutlined';
-import SaveIcon from '@mui/icons-material/Save';
-import PrintIcon from '@mui/icons-material/Print';
-import ShareIcon from '@mui/icons-material/Share';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { pink } from '@mui/material/colors';
-import Radio from '@mui/material/Radio';
-import RadioGroup from '@mui/material/RadioGroup';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import FormControl from '@mui/material/FormControl';
-import FormLabel from '@mui/material/FormLabel';
-import Divider from '@mui/material/Divider';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { Link } from 'react-router-dom';
+
 import '../styles/home.css'
-import { work, financial } from "../data/goals";
-import Stack from '@mui/material/Stack';
-import AddTaskIcon from '@mui/icons-material/AddTask';
-import Input from '@mui/material/Input';
-import { Navigate, useNavigate } from 'react-router-dom'
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { mentee } from "../data/user";
+
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -61,23 +24,14 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+
 import EmailIcon from '@mui/icons-material/Email';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import Avatar from '@mui/material/Avatar';
 import zul from './zul.jpg';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-import { deepPurple } from '@mui/material/colors';
 
-import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
-import FaceIcon from '@mui/icons-material/Face';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import HighlightOffIcon from '@mui/icons-material/HighlightOff';
-import ForumIcon from '@mui/icons-material/Forum';
-import PeopleIcon from '@mui/icons-material/People';
-import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-import BadgeIcon from '@mui/icons-material/Badge';
 ChartJS.register(
     CategoryScale,
     LinearScale,
