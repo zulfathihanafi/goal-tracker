@@ -231,7 +231,7 @@ const Finance = () => {
             date: moment().format("ll"),
             mentor: user.displayName,
             mentorEmail : user.email,
-                timastamp : Date.now()
+                timestamp : Date.now()
         }).then(()=>{
             var dbRefComment = db.collection('users').doc(user.email).collection("Comments")
 
