@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react"
 
 import { UserContext } from '../userContext'
-
+import emailjs from '@emailjs/browser';
 import bootstrap from 'bootstrap'
 import '../styles/nonhabitual.css'
 import LinearProgress from '@mui/material/LinearProgress';
@@ -138,7 +138,7 @@ const Finance = () => {
     }
 
 
-    const { user, setUser,userRole } = useContext(UserContext);
+    const { user, setUser, userRole } = useContext(UserContext);
 
 
 
@@ -149,7 +149,7 @@ const Finance = () => {
 
     useEffect(() => {
         updateData()
-        var dbRefComments = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('comments').orderBy("timestamp","desc")
+        var dbRefComments = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('comments').orderBy("timestamp", "desc")
         dbRefComments.onSnapshot(snapshot => {
             setComments(snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -160,14 +160,14 @@ const Finance = () => {
             ));
         })
 
-        if(user.email == email){ // if the email of the current User (mentee) equal to mentee email (from url)
+        if (user.email == email) { // if the email of the current User (mentee) equal to mentee email (from url)
             comments.forEach(comment => {
 
                 var ref = db.collection('users').doc(comment.comment.mentorEmail).collection("Comments").doc(comment.id)
                 ref.update({
-                    status : 'read'
+                    status: 'read'
                 })
-                
+
             });
         }
     }, [transactions])
@@ -230,32 +230,45 @@ const Finance = () => {
             comment: newComment,
             date: moment().format("ll"),
             mentor: user.displayName,
-            mentorEmail : user.email,
-                timestamp : Date.now()
-        }).then(()=>{
+            mentorEmail: user.email,
+            timestamp: Date.now()
+        }).then(() => {
             var dbRefComment = db.collection('users').doc(user.email).collection("Comments")
 
 
-        db.collection('users').doc(email).get().then((doc)=>{
-            var data = doc.data()
-            dbRefComment.doc(dbRef.id).set({
-                menteeName : data.displayName,
-                comment: newComment,
-                date: moment().format("ll"),
-                mentor: user.displayName,
-                title : goalData.Title,
-                emailGoal : email,
-                goalID : id,
-                goalType : 'Financial',
-                status : "unread",
-                timastamp : Date.now()
+            db.collection('users').doc(email).get().then((doc) => {
+                var data = doc.data()
+                dbRefComment.doc(dbRef.id).set({
+                    menteeName: data.displayName,
+                    comment: newComment,
+                    date: moment().format("ll"),
+                    mentor: user.displayName,
+                    title: goalData.Title,
+                    emailGoal: email,
+                    goalID: id,
+                    goalType: 'Financial',
+                    status: "unread",
+                    timestamp: Date.now()
+                })
+
+                // to send email
+                emailjs.send('service_egi0mft', 'template_goal', {
+                    mentee_email: email,
+                    mentee_name: data.displayName,
+                    mentor_name: user.displayName,
+                    comment: newComment,
+                    goal_name: goalData.title
+                }, 'ZTZ-Cgjv6xpoEhBrq')
+                    .then((result) => {
+                        alert("Email sent to: " + email)
+                    }, (error) => {
+                        console.log(error.text);
+                    });
             })
-            
-        })
         })
 
         //need to refer to mentor email
-        
+
 
 
 
@@ -543,62 +556,62 @@ const Finance = () => {
                                         </div>
                                     </Item>
                                 </Grid>
-                                
-                                <Grid container spacing={1} sx={{ marginTop: '80px' }}>
-                                        <Grid item xs={12}>
-                                            <Item2>
-                                                <Typography variant="h4" sx={{ fontWeight: 'bold', marginBottom: '30px' }}>
-                                                    Previous comment
-                                                </Typography>
-                                                <Stack container spacing={2}>
-                                                    {
-                                                        comments.map((comment) => (
 
-                                                            <Item2 sx={{ boxShadow: 2 }}>
-                                                                <Grid container spacing={2}>
-                                                                    <Grid item xs={9}>
-                                                                        <Item2>
-                                                                            <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
-                                                                                Comment
-                                                                            </Typography>
-                                                                            <Typography variant="h6" alignItems='center' sx={{ textAlign: 'left' }}>
-                                                                                {comment.comment.comment}
-                                                                            </Typography>
-                                                                        </Item2>
-                                                                    </Grid>
-                                                                    <Grid item xs={2}>
-                                                                        <Item2>
-                                                                            <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
-                                                                                Date Given
-                                                                            </Typography>
-                                                                            <Typography variant="h6" alignItems='center' sx={{ alignItems: 'center', textAlign: 'center' }}>
-                                                                                {comment.comment.date}
-                                                                            </Typography>
-                                                                        </Item2>
-                                                                        <Item2>
-                                                                            <Typography variant="h5" sx={{ color: 'black', textAlign: 'center'}}>
-                                                                                From
-                                                                            </Typography>
-                                                                            <Typography variant="h6" alignItems='center' sx={{ alignItems: 'center', textAlign: 'center' }}>
-                                                                                {comment.comment.mentor}
-                                                                            </Typography>
-                                                                        </Item2>
-                                                                    </Grid>
-                                                                    <Grid item xs={1}>
-                                                                        <Item2 justifyContent='center' alignItems='center' sx={{ height: '100%' }}>
-                                                                            <Box display="flex" justifyContent='center' alignItems='center' sx={{ height: '100%' }}>
-                                                                                <CheckCircleOutlineIcon color="primary" sx={{ width: '40px', height: '40px' }} />
-                                                                            </Box>
-                                                                        </Item2>
-                                                                    </Grid>
+                                <Grid container spacing={1} sx={{ marginTop: '80px' }}>
+                                    <Grid item xs={12}>
+                                        <Item2>
+                                            <Typography variant="h4" sx={{ fontWeight: 'bold', marginBottom: '30px' }}>
+                                                Previous comment
+                                            </Typography>
+                                            <Stack container spacing={2}>
+                                                {
+                                                    comments.map((comment) => (
+
+                                                        <Item2 sx={{ boxShadow: 2 }}>
+                                                            <Grid container spacing={2}>
+                                                                <Grid item xs={9}>
+                                                                    <Item2>
+                                                                        <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
+                                                                            Comment
+                                                                        </Typography>
+                                                                        <Typography variant="h6" alignItems='center' sx={{ textAlign: 'left' }}>
+                                                                            {comment.comment.comment}
+                                                                        </Typography>
+                                                                    </Item2>
                                                                 </Grid>
-                                                            </Item2>
-                                                        ))
-                                                    }
-                                                </Stack>
-                                            </Item2>
-                                        </Grid>
+                                                                <Grid item xs={2}>
+                                                                    <Item2>
+                                                                        <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
+                                                                            Date Given
+                                                                        </Typography>
+                                                                        <Typography variant="h6" alignItems='center' sx={{ alignItems: 'center', textAlign: 'center' }}>
+                                                                            {comment.comment.date}
+                                                                        </Typography>
+                                                                    </Item2>
+                                                                    <Item2>
+                                                                        <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
+                                                                            From
+                                                                        </Typography>
+                                                                        <Typography variant="h6" alignItems='center' sx={{ alignItems: 'center', textAlign: 'center' }}>
+                                                                            {comment.comment.mentor}
+                                                                        </Typography>
+                                                                    </Item2>
+                                                                </Grid>
+                                                                <Grid item xs={1}>
+                                                                    <Item2 justifyContent='center' alignItems='center' sx={{ height: '100%' }}>
+                                                                        <Box display="flex" justifyContent='center' alignItems='center' sx={{ height: '100%' }}>
+                                                                            <CheckCircleOutlineIcon color="primary" sx={{ width: '40px', height: '40px' }} />
+                                                                        </Box>
+                                                                    </Item2>
+                                                                </Grid>
+                                                            </Grid>
+                                                        </Item2>
+                                                    ))
+                                                }
+                                            </Stack>
+                                        </Item2>
                                     </Grid>
+                                </Grid>
 
                             </Grid>
                         </div>
@@ -672,30 +685,30 @@ const Finance = () => {
                                                         <th scope="col" class="col-2">Amount</th>
                                                         <th scope="col" class="col-2">Type</th>
                                                         <th scope="col" class="col-2">Date</th>
-                                                        
+
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {transactions.map((transaction, index) => (
-                                                        
-                                                            <tr>
-                                                                <th scope="row">
-                                                                    {index + 1}
-                                                                </th>
-                                                                <td>{transaction.transaction.details}</td>
-                                                                <td>
-                                                                    {transaction.transaction.type == 'Credit' ?
-                                                                        <strong
-                                                                            style={{ color: 'green' }}
-                                                                        >+ {transaction.transaction.amount.toFixed(2)}</strong> :
-                                                                        <strong
-                                                                            style={{ color: 'red' }}
-                                                                        >- {transaction.transaction.amount.toFixed(2)}</strong>}
-                                                                </td>
-                                                                <td><strong>{transaction.transaction.type}</strong></td>
-                                                                <td>{transaction.transaction.date}</td>
-                                                   
-                                                            </tr>
+
+                                                        <tr>
+                                                            <th scope="row">
+                                                                {index + 1}
+                                                            </th>
+                                                            <td>{transaction.transaction.details}</td>
+                                                            <td>
+                                                                {transaction.transaction.type == 'Credit' ?
+                                                                    <strong
+                                                                        style={{ color: 'green' }}
+                                                                    >+ {transaction.transaction.amount.toFixed(2)}</strong> :
+                                                                    <strong
+                                                                        style={{ color: 'red' }}
+                                                                    >- {transaction.transaction.amount.toFixed(2)}</strong>}
+                                                            </td>
+                                                            <td><strong>{transaction.transaction.type}</strong></td>
+                                                            <td>{transaction.transaction.date}</td>
+
+                                                        </tr>
                                                     ))}
                                                 </tbody>
                                             </table>
@@ -704,85 +717,88 @@ const Finance = () => {
                                 </Grid>
                                 {/* Add comment here */}
                                 <Grid container spacing={1} sx={{ marginTop: '80px' }}>
-                                        <Grid item xs={12}>
-                                            <Item2>
-                                                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                                                    Leave your comment here:
-                                                </Typography>
+                                    <Grid item xs={12}>
+                                        <Item2>
+                                            <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+                                                Leave your comment here:
+                                            </Typography>
 
 
-                                                <TextField id="outlined-textarea" label="Comment" multiline sx={{ marginTop: '20px', width: '100%' }} onChange={e => {
-                                                    setNewComment(e.target.value)
-                                                }} />
+                                            <TextField id="outlined-textarea" label="Comment" multiline sx={{ marginTop: '20px', width: '100%' }} onChange={e => {
+                                                setNewComment(e.target.value)
+                                            }} />
 
 
-                                                <Box display="flex" justifyContent='flex-end' alignItems='center' sx={{ marginTop: "10px" }}>
-                                                    <Button startIcon={<CheckCircleIcon />} color="success" size="large" variant="contained" sx={{ marginTop: "10px" }} onClick={e => { addComment(e) }}>
-                                                        Submit
-                                                    </Button>
-                                                </Box>
-                                            </Item2>
-                                        </Grid>
+                                            <Box display="flex" justifyContent='flex-end' alignItems='center' sx={{ marginTop: "10px" }}>
+                                                <div style={{ paddingRight: '20px' }}>
+                                                    An email will be sent to notify this user !
+                                                </div>
+                                                <Button startIcon={<CheckCircleIcon />} color="success" size="large" variant="contained" sx={{ marginTop: "10px" }} onClick={e => { addComment(e) }}>
+                                                    Submit
+                                                </Button>
+                                            </Box>
+                                        </Item2>
                                     </Grid>
+                                </Grid>
 
 
-                                    {/* comments section */}
-                                    <Grid container spacing={1} sx={{ marginTop: '80px' }}>
-                                        <Grid item xs={12}>
-                                            <Item2>
-                                                <Typography variant="h4" sx={{ fontWeight: 'bold', marginBottom: '30px' }}>
-                                                    Previous comment
-                                                </Typography>
-                                                <Stack container spacing={2}>
-                                                    {
-                                                        comments.map((comment) => (
+                                {/* comments section */}
+                                <Grid container spacing={1} sx={{ marginTop: '80px' }}>
+                                    <Grid item xs={12}>
+                                        <Item2>
+                                            <Typography variant="h4" sx={{ fontWeight: 'bold', marginBottom: '30px' }}>
+                                                Previous comment
+                                            </Typography>
+                                            <Stack container spacing={2}>
+                                                {
+                                                    comments.map((comment) => (
 
-                                                            <Item2 sx={{ boxShadow: 2 }}>
-                                                                <Grid container spacing={2}>
-                                                                    <Grid item xs={9}>
-                                                                        <Item2>
-                                                                            <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
-                                                                                Comment
-                                                                            </Typography>
-                                                                            <Typography variant="h6" alignItems='center' sx={{ textAlign: 'left' }}>
-                                                                                {comment.comment.comment}
-                                                                            </Typography>
-                                                                        </Item2>
-                                                                    </Grid>
-                                                                    <Grid item xs={2}>
-                                                                        <Item2>
-                                                                            <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
-                                                                                Date Given
-                                                                            </Typography>
-                                                                            <Typography variant="h6" alignItems='center' sx={{ alignItems: 'center', textAlign: 'center' }}>
-                                                                                {comment.comment.date}
-                                                                            </Typography>
-                                                                        </Item2>
-                                                                        <Item2>
-                                                                            <Typography variant="h5" sx={{ color: 'black', textAlign: 'center'}}>
-                                                                                From
-                                                                            </Typography>
-                                                                            <Typography variant="h6" alignItems='center' sx={{ alignItems: 'center', textAlign: 'center' }}>
-                                                                                {comment.comment.mentor}
-                                                                            </Typography>
-                                                                        </Item2>
-                                                                    </Grid>
-                                                                    <Grid item xs={1}>
-                                                                        <Item2 justifyContent='center' alignItems='center' sx={{ height: '100%' }}>
-                                                                            <Box display="flex" justifyContent='center' alignItems='center' sx={{ height: '100%' }}>
-                                                                                <CheckCircleOutlineIcon color="primary" sx={{ width: '40px', height: '40px' }} />
-                                                                            </Box>
-                                                                        </Item2>
-                                                                    </Grid>
+                                                        <Item2 sx={{ boxShadow: 2 }}>
+                                                            <Grid container spacing={2}>
+                                                                <Grid item xs={9}>
+                                                                    <Item2>
+                                                                        <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
+                                                                            Comment
+                                                                        </Typography>
+                                                                        <Typography variant="h6" alignItems='center' sx={{ textAlign: 'left' }}>
+                                                                            {comment.comment.comment}
+                                                                        </Typography>
+                                                                    </Item2>
                                                                 </Grid>
-                                                            </Item2>
+                                                                <Grid item xs={2}>
+                                                                    <Item2>
+                                                                        <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
+                                                                            Date Given
+                                                                        </Typography>
+                                                                        <Typography variant="h6" alignItems='center' sx={{ alignItems: 'center', textAlign: 'center' }}>
+                                                                            {comment.comment.date}
+                                                                        </Typography>
+                                                                    </Item2>
+                                                                    <Item2>
+                                                                        <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
+                                                                            From
+                                                                        </Typography>
+                                                                        <Typography variant="h6" alignItems='center' sx={{ alignItems: 'center', textAlign: 'center' }}>
+                                                                            {comment.comment.mentor}
+                                                                        </Typography>
+                                                                    </Item2>
+                                                                </Grid>
+                                                                <Grid item xs={1}>
+                                                                    <Item2 justifyContent='center' alignItems='center' sx={{ height: '100%' }}>
+                                                                        <Box display="flex" justifyContent='center' alignItems='center' sx={{ height: '100%' }}>
+                                                                            <CheckCircleOutlineIcon color="primary" sx={{ width: '40px', height: '40px' }} />
+                                                                        </Box>
+                                                                    </Item2>
+                                                                </Grid>
+                                                            </Grid>
+                                                        </Item2>
 
-                                                        ))
-                                                    }
-                                                </Stack>
-                                            </Item2>
-                                        </Grid>
+                                                    ))
+                                                }
+                                            </Stack>
+                                        </Item2>
                                     </Grid>
+                                </Grid>
 
                             </Grid>
                         </div>

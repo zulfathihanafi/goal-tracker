@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom"
 import '../styles/nonhabitual.css'
 import TextField from '@mui/material/TextField';
 import Input from '@mui/material/Input';
+import emailjs from '@emailjs/browser';
 import DropdownButton from 'react-bootstrap/DropdownButton'
 import Dropdown from 'react-bootstrap/Dropdown'
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -76,7 +77,7 @@ const Nonhabitual = () => {
 
     // Transactions
     const [tasks, setTasks] = useState([])
-    
+
     // for commenting purposes
     const [newComment, setNewComment] = useState('')
     const [comments, setComments] = useState([])
@@ -123,7 +124,7 @@ const Nonhabitual = () => {
 
 
         //get New Comments
-        var dbRefComments = db.collection('users').doc(email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('comments').orderBy("timestamp","desc")
+        var dbRefComments = db.collection('users').doc(email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('comments').orderBy("timestamp", "desc")
         dbRefComments.onSnapshot(snapshot => {
             setComments(snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -134,17 +135,17 @@ const Nonhabitual = () => {
             ));
         })
 
-        if(user.email == email){ // if the email of the current User (mentee) equal to mentee email (from url)
+        if (user.email == email) { // if the email of the current User (mentee) equal to mentee email (from url)
             comments.forEach(comment => {
 
                 var ref = db.collection('users').doc(comment.comment.mentorEmail).collection("Comments").doc(comment.id)
                 ref.update({
-                    status : 'read'
+                    status: 'read'
                 })
-                
+
             });
         }
-        
+
     }, [goalData])
 
 
@@ -230,36 +231,51 @@ const Nonhabitual = () => {
             comment: newComment,
             date: moment().format("ll"),
             mentor: user.displayName,
-            mentorEmail : user.email,
-            timestamp : Date.now()
-        }).then(()=>{
-            
+            mentorEmail: user.email,
+            timestamp: Date.now()
+        }).then(() => {
+
             var dbRefComment = db.collection('users').doc(user.email).collection("Comments")
 
 
-            db.collection('users').doc(email).get().then((doc)=>{
+            db.collection('users').doc(email).get().then((doc) => {
                 var data = doc.data()
                 dbRefComment.doc(dbRef.id).set({
-                    menteeName : data.displayName,
+                    menteeName: data.displayName,
                     comment: newComment,
                     date: moment().format("ll"),
                     mentor: user.displayName,
-                    title : goalData.title,
-                    emailGoal : email,
-                    goalID : id,
-                    goalType : 'Work',
-                    status : "unread",
-                    timestamp : Date.now()
+                    title: goalData.title,
+                    emailGoal: email,
+                    goalID: id,
+                    goalType: 'Work',
+                    status: "unread",
+                    timestamp: Date.now()
                 })
-                
+
+                // to send email
+                emailjs.send('service_egi0mft', 'template_goal', {
+                    mentee_email : email,
+                    mentee_name : data.displayName,
+                    mentor_name : user.displayName,
+                    comment : newComment,
+                    goal_name : goalData.title
+                }, 'ZTZ-Cgjv6xpoEhBrq')
+                    .then((result) => {
+                        alert("Email sent to: "+email)
+                    }, (error) => {
+                        console.log(error.text);
+                    });
             })
-        
-        
+
+            
+            
+
         })
 
 
         //need to refer to mentor email
-        
+
 
         setNewComment('')
     }
@@ -647,6 +663,9 @@ const Nonhabitual = () => {
 
 
                                                 <Box display="flex" justifyContent='flex-end' alignItems='center' sx={{ marginTop: "10px" }}>
+                                                <div style={{paddingRight:'20px'}}>
+                                                    An email will be sent to notify this user !
+                                                </div>
                                                     <Button startIcon={<CheckCircleIcon />} color="success" size="large" variant="contained" sx={{ marginTop: "10px" }} onClick={e => { addComment(e) }}>
                                                         Submit
                                                     </Button>
@@ -689,7 +708,7 @@ const Nonhabitual = () => {
                                                                             </Typography>
                                                                         </Item2>
                                                                         <Item2>
-                                                                            <Typography variant="h5" sx={{ color: 'black', textAlign: 'center'}}>
+                                                                            <Typography variant="h5" sx={{ color: 'black', textAlign: 'center' }}>
                                                                                 From
                                                                             </Typography>
                                                                             <Typography variant="h6" alignItems='center' sx={{ alignItems: 'center', textAlign: 'center' }}>
