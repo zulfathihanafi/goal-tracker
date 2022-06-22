@@ -10,7 +10,8 @@ import { auth, storage, db } from "../components/firebase";
 import ImageUpload from "../components/uploadImage";
 const Profile = () => {
 
-    const { user, setUser } = useContext(UserContext);
+    const { user, setUser } = useContext(UserContext); 
+
     const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [userOccupation, setUserOccupation] = useState('');
@@ -57,12 +58,7 @@ const Profile = () => {
                         .child(image.name)
                         .getDownloadURL()
                         .then(url => {
-                            //post image inside db
-                            // db.collection("users").doc(user.email).update({
-                                
-                            //     imageUrl: url
-                                
-                            // });
+                        
                             setUrlImage(url)
 
                             
@@ -79,7 +75,7 @@ const Profile = () => {
 
 
     useEffect(() => {
-
+        
         db.collection("users").doc(user.email).get().then((doc) => {
             var data = doc.data()
             
@@ -89,9 +85,9 @@ const Profile = () => {
             setUserPhone(data.phoneNumber)
             setUserRole(data.role)
             setUserImage(data.imageUrl)
-
+            console.log("profile"+userName)
         })
-        console.log("role" + userRole)
+        
     }, []);
 
     const [enableEdit, setEdit] = React.useState(true)
