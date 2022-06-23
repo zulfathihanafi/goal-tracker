@@ -5,17 +5,29 @@ var firebaseApp;
 if (!firebase.apps.length) {
   firebaseApp = firebase.initializeApp({
 
-  apiKey: "AIzaSyCIPHsZV5u-3SV52cRBe51Mz6KHm6wzxKk",
+  // apiKey: "AIzaSyCIPHsZV5u-3SV52cRBe51Mz6KHm6wzxKk",
 
-  authDomain: "goaltracker-5afae.firebaseapp.com",
+  // authDomain: "goaltracker-5afae.firebaseapp.com",
 
-  projectId: "goaltracker-5afae",
+  // projectId: "goaltracker-5afae",
 
-  storageBucket: "goaltracker-5afae.appspot.com",
+  // storageBucket: "goaltracker-5afae.appspot.com",
 
-  messagingSenderId: "138441413111",
+  // messagingSenderId: "138441413111",
 
-  appId: "1:138441413111:web:fb5eb120508e2dc1a81ef2"
+  // appId: "1:138441413111:web:fb5eb120508e2dc1a81ef2"
+  apiKey: "AIzaSyCKu5GiE6C9DWR5sxIl2272QNQDmx8aMas",
+
+  authDomain: "goaltracker2.firebaseapp.com",
+
+  projectId: "goaltracker2",
+
+  storageBucket: "goaltracker2.appspot.com",
+
+  messagingSenderId: "644252277095",
+
+  appId: "1:644252277095:web:26d5f675e498e01648b7c2"
+
 
   });
 }else {

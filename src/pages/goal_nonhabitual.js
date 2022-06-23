@@ -33,7 +33,9 @@ import DialogTitle from '@mui/material/DialogTitle';
 import moment from 'moment';
 import FormControl from '@mui/material/FormControl';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import Stack from '@mui/material/Stack';
+import WarningIcon from '@mui/icons-material/Warning';
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
@@ -68,10 +70,15 @@ const Nonhabitual = () => {
     const [currentEditTask, setCurrentEditTask] = useState('')
     const [currentEditDue, setCurrentEditDue] = useState('')
 
+    const [deleteDialog, setDeleteDialog] = useState(false)
 
     const [newTask, setNewTask] = useState({ task: '', due: '' })
     const [openNewTaskDialog, setOpenNewTaskDialog] = useState(false)
 
+    const [reminderDialog, setReminderDialog] = useState(false)
+    const [reminder, setReminder] = useState('')
+    const [reminderDate, setReminderDate] = useState('')
+    const [reminderTime, setReminderTime] = useState('')
     // Data Details
     const [goalData, setGoalData] = useState()
 
@@ -100,6 +107,11 @@ const Nonhabitual = () => {
             var data = doc.data()
 
             setGoalData(data)
+        })
+        var dbRefNoti = db.collection('users').doc(email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('Reminder').doc(email)
+        dbRefNoti.get().then((doc) => {
+            var data = doc.data()
+            setReminder(moment(data.timestampDue).format('lll'))
         })
         var currentPendingActivities = []
         var currentFinishedActivities = []
@@ -255,21 +267,21 @@ const Nonhabitual = () => {
 
                 // to send email
                 emailjs.send('service_egi0mft', 'template_goal', {
-                    mentee_email : email,
-                    mentee_name : data.displayName,
-                    mentor_name : user.displayName,
-                    comment : newComment,
-                    goal_name : goalData.title
+                    mentee_email: email,
+                    mentee_name: data.displayName,
+                    mentor_name: user.displayName,
+                    comment: newComment,
+                    goal_name: goalData.title
                 }, 'ZTZ-Cgjv6xpoEhBrq')
                     .then((result) => {
-                        alert("Email sent to: "+email)
+                        alert("Email sent to: " + email)
                     }, (error) => {
                         console.log(error.text);
                     });
             })
 
-            
-            
+
+
 
         })
 
@@ -280,6 +292,27 @@ const Nonhabitual = () => {
         setNewComment('')
     }
 
+    function addReminderFunc() {
+        console.log(reminderDate + reminderTime)
+        console.log(moment(reminderDate + reminderTime).format('lll'))
+
+        var dbRef = db.collection('users').doc(email).collection("Goals").doc('Work').collection('WorkGoals').doc(id).collection('Reminder').doc(email)
+        dbRef.set({
+            timestampDue: reminderDate + reminderTime
+        }).then(() => {
+            var dbRefNoti = db.collection('users').doc(email).collection('Notification').doc()
+            dbRefNoti.set({
+                message: 'Reminder : ' + goalData.title,
+                timestampDue: reminderDate + reminderTime,
+                menteeEmail: email,
+                goalID: id,
+                goalType: 'work',
+                view: false
+            })
+        })
+
+        setReminderDialog(false)
+    }
     const addTaskDialog = (
         <Dialog open={openNewTaskDialog} onClose={e => { setOpenNewTaskDialog(false) }} fullWidth="xl">
             <DialogTitle style={{ fontSize: "30px" }}>Add New Task</DialogTitle>
@@ -312,6 +345,66 @@ const Nonhabitual = () => {
             <DialogActions>
                 <Button onClick={e => setOpenNewTaskDialog(false)}>Cancel</Button>
                 <Button onClick={e => addNewTask()}>Add</Button>
+            </DialogActions>
+        </Dialog>
+    )
+
+    const addReminder = (
+        <Dialog open={reminderDialog} onClose={e => { setReminderDialog(false) }} fullWidth="xl">
+            <DialogTitle style={{ fontSize: "30px" }}>Add New Reminder</DialogTitle>
+            <FormControl>
+                <DialogContent>
+                    <DialogContentText style={{ fontWeight: 'bold' }}>
+                        Reminder Date
+                    </DialogContentText>
+                    <DialogContentText style={{ fontWeight: 'bold' }}>
+                        <input
+                            type="date" id="birthdaytime"
+                            name="birthdaytime"
+                            onChange={e => { setReminderDate(moment(e.target.value).valueOf()); }}>
+                        </input>
+                    </DialogContentText>
+
+                    <DialogContentText style={{ fontWeight: 'bold', marginTop: '15px', marginBottom: "10px" }}>
+                        Reminder Time
+                    </DialogContentText>
+                    <DialogContentText style={{ fontWeight: 'bold', marginTop: '15px', marginBottom: "10px" }}>
+                        <input
+                            type="time" id="birthdaytime"
+                            name="birthdaytime"
+                            onChange={e => { setReminderTime(moment(e.target.valueAsDate).valueOf()); }}>
+                        </input>
+                    </DialogContentText>
+
+                </DialogContent>
+            </FormControl>
+            <DialogActions>
+                <Button onClick={e => setReminderDialog(!reminderDialog)}>Cancel</Button>
+                <Button onClick={e => addReminderFunc()}>Add</Button>
+            </DialogActions>
+        </Dialog>
+    )
+
+    const deleteReminderDialog = (
+        <Dialog open={deleteDialog} onClose={e => { setDeleteDialog(false) }} fullWidth="xl">
+            <DialogTitle style={{ fontSize: "30px", alignContent: "center" }} alignContent="center"><WarningIcon color="error" sx={{ width: '40px', height: '40px' }} />Delete Goal ?</DialogTitle>
+            <FormControl>
+                <DialogContent>
+                    <DialogContentText style={{ fontWeight: 'bold' }}>
+                        All of the data of this goal will be deleted <br></br>This can’t be undone and it will be removed from your profile
+                    </DialogContentText>
+                    <DialogContentText style={{ fontWeight: 'bold' }}>
+
+                    </DialogContentText>
+
+
+                </DialogContent>
+            </FormControl>
+            <DialogActions>
+                <Button onClick={e => setDeleteDialog(false)}>Cancel</Button>
+                <Button variant="contained" color="error" sx={{ marginLeft: '10px', marginTop: "10px" }} startIcon={<DeleteIcon />} onClick={e => {deleteGoal()}}>
+                    Delete Goal
+                </Button>
             </DialogActions>
         </Dialog>
     )
@@ -353,6 +446,12 @@ const Nonhabitual = () => {
                                 {goalData.title}
                             </h1>
                             <br></br>
+                            <NotificationsIcon sx={{ mr: 0.5, marginBottom: '10px' }} fontSize="large" /> Current Reminder : {reminder == "" ? ('Please set a reminder first') : (reminder)}
+                            <br></br>
+                            <Button onClick={e => { setReminderDialog(!reminderDialog) }} variant="contained" size="large" style={{ marginTop: '0px', marginBottom: "15px" }}>
+                                {reminder == "" ? ('Add Reminder') : ('Edit Reminder')}
+                            </Button>
+                            {addReminder}
                             <Grid container spacing={1}>
                                 <Grid item xs={12}>
                                     <Item sx={{ height: '100%', border: 1, borderShadow: 0 }}>
@@ -464,9 +563,9 @@ const Nonhabitual = () => {
                                                 </tbody>
                                             </table>
 
-
+                                            {deleteReminderDialog}
                                             <Box display="flex" justifyContent='flex-end' alignItems='center' sx={{ marginTop: "10px" }}>
-                                                <Button variant="contained" color="error" sx={{ marginLeft: '10px', marginTop: "10px" }} startIcon={<DeleteIcon />} onClick={e => { deleteGoal() }}>
+                                                <Button variant="contained" color="error" sx={{ marginLeft: '10px', marginTop: "10px" }} startIcon={<DeleteIcon />} onClick={e => { setDeleteDialog(true) }}>
                                                     Delete Goal
                                                 </Button>
                                             </Box>
@@ -663,9 +762,9 @@ const Nonhabitual = () => {
 
 
                                                 <Box display="flex" justifyContent='flex-end' alignItems='center' sx={{ marginTop: "10px" }}>
-                                                <div style={{paddingRight:'20px'}}>
-                                                    An email will be sent to notify this user !
-                                                </div>
+                                                    <div style={{ paddingRight: '20px' }}>
+                                                        An email will be sent to notify this user !
+                                                    </div>
                                                     <Button startIcon={<CheckCircleIcon />} color="success" size="large" variant="contained" sx={{ marginTop: "10px" }} onClick={e => { addComment(e) }}>
                                                         Submit
                                                     </Button>

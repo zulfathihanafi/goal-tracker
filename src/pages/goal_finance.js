@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react"
-
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import { UserContext } from '../userContext'
 import emailjs from '@emailjs/browser';
 import bootstrap from 'bootstrap'
@@ -46,6 +46,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import Stack from '@mui/material/Stack';
+import WarningIcon from '@mui/icons-material/Warning';
 const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
     ...theme.typography.body2,
@@ -91,7 +92,7 @@ const Finance = () => {
     const [transactions, setTransactions] = useState([])
     let navigate = useNavigate();
 
-
+    const [deleteDialog, setDeleteDialog] = useState(false)
     //edit purposes
     const [currentEdit, setCurrentEdit] = useState('')
     const [currentEditDetails, setCurrentEditDetails] = useState('')
@@ -103,6 +104,12 @@ const Finance = () => {
     const [newComment, setNewComment] = useState('')
     const [comments, setComments] = useState([])
     const [menteeName, setMenteeName] = useState('')
+
+    // reminder
+    const [reminderDialog, setReminderDialog] = useState(false)
+    const [reminder, setReminder] = useState('')
+    const [reminderDate, setReminderDate] = useState('')
+    const [reminderTime, setReminderTime] = useState('')
 
     function saveCurrentEdit() {
         var dbRef = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('transactions').doc(currentEdit)
@@ -169,7 +176,11 @@ const Finance = () => {
 
             ));
         })
-
+        var dbRefNoti = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('Reminder').doc(email)
+        dbRefNoti.get().then((doc) => {
+            var data = doc.data()
+            setReminder(moment(data.timestampDue).format('lll'))
+        })
         if (user.email == email) { // if the email of the current User (mentee) equal to mentee email (from url)
             comments.forEach(comment => {
 
@@ -284,7 +295,63 @@ const Finance = () => {
 
         setNewComment('')
     }
+    function addReminderFunc(){
+        console.log(reminderDate + reminderTime)
+        console.log(moment(reminderDate + reminderTime).format('lll'))
 
+        var dbRef = db.collection('users').doc(email).collection("Goals").doc('Financial').collection('FinancialGoals').doc(id).collection('Reminder').doc(email)
+        dbRef.set({
+            timestampDue : reminderDate + reminderTime
+        }).then(()=>{
+            var dbRefNoti = db.collection('users').doc(email).collection('Notification').doc()
+            dbRefNoti.set({
+                message : 'Reminder : '+goalData.Title,
+                timestampDue : reminderDate + reminderTime,
+                menteeEmail : email,
+                goalID : id,
+                goalType : 'financial',
+                view : false
+            })
+        })
+
+        setReminderDialog(false)
+    }
+
+    const addReminder = (
+        <Dialog open={reminderDialog} onClose={e => { setReminderDialog(false) }} fullWidth="xl">
+            <DialogTitle style={{ fontSize: "30px" }}>Add New Reminder</DialogTitle>
+            <FormControl>
+                <DialogContent>
+                    <DialogContentText style={{ fontWeight: 'bold' }}>
+                        Reminder Date
+                    </DialogContentText>
+                    <DialogContentText style={{ fontWeight: 'bold' }}>
+                    <input
+                        type="date" id="birthdaytime"
+                        name="birthdaytime"
+                        onChange={e => { setReminderDate(moment(e.target.value).valueOf()); }}>
+                    </input>
+                    </DialogContentText>
+                    
+                    <DialogContentText style={{ fontWeight: 'bold', marginTop: '15px', marginBottom: "10px" }}>
+                        Reminder Time
+                    </DialogContentText>
+                    <DialogContentText style={{ fontWeight: 'bold', marginTop: '15px', marginBottom: "10px" }}>
+                    <input
+                        type="time" id="birthdaytime"
+                        name="birthdaytime"
+                        onChange={e => { setReminderTime(moment(e.target.valueAsDate).valueOf()); }}>
+                    </input>
+                    </DialogContentText>
+                    
+                </DialogContent>
+            </FormControl>
+            <DialogActions>
+                <Button onClick={e => setReminderDialog(!reminderDialog)}>Cancel</Button>
+                <Button onClick={e => addReminderFunc()}>Add</Button>
+            </DialogActions>
+        </Dialog>
+    )
 
     const addTransactionDialog = (
 
@@ -357,6 +424,31 @@ const Finance = () => {
 
             </DialogActions>
         </Dialog>)
+    
+    const deleteReminderDialog = (
+        <Dialog open={deleteDialog} onClose={e => { setDeleteDialog(false) }} fullWidth="xl">
+            <DialogTitle style={{ fontSize: "30px", alignContent: "center" }} alignContent="center"><WarningIcon color="error" sx={{ width: '40px', height: '40px' }} />Delete Goal ?</DialogTitle>
+            <FormControl>
+                <DialogContent>
+                    <DialogContentText style={{ fontWeight: 'bold' }}>
+                        All of the data of this goal will be deleted <br></br>This can’t be undone and it will be removed from your profile
+                    </DialogContentText>
+                    <DialogContentText style={{ fontWeight: 'bold' }}>
+
+                    </DialogContentText>
+
+
+                </DialogContent>
+            </FormControl>
+            <DialogActions>
+                <Button onClick={e => setDeleteDialog(false)}>Cancel</Button>
+                <Button variant="contained" color="error" sx={{ marginLeft: '10px', marginTop: "10px" }} startIcon={<DeleteIcon />} onClick={e => {deleteGoal()}}>
+                    Delete Goal
+                </Button>
+            </DialogActions>
+        </Dialog>
+    )
+
     function addTransaction(e) {
         // console.log(newTransaction)
 
@@ -426,6 +518,12 @@ const Finance = () => {
                                 {goalData.Title}
                             </h1>
                             <br></br>
+                            <NotificationsIcon sx={{ mr: 0.5, marginBottom: '10px' }} fontSize="large" /> Current Reminder : {reminder == "" ? ('Please set a reminder first') : (reminder)}
+                            <br></br>
+                            <Button onClick={e => { setReminderDialog(!reminderDialog) }} variant="contained" size="large" style={{ marginTop: '0px', marginBottom: "15px" }}>
+                                {reminder == "" ? ('Add Reminder') : ('Edit Reminder')}
+                            </Button>
+                            {addReminder}
                             <Grid container spacing={1}>
                                 <Grid item xs={12}>
                                     <Item sx={{ height: '100%', border: 1, borderColor: 'secondary.main', borderShadow: 0 }}>
@@ -556,9 +654,9 @@ const Finance = () => {
                                                 </tbody>
                                             </table>
 
-
+                                            {deleteReminderDialog}
                                             <Box display="flex" justifyContent='flex-end' alignItems='center' sx={{ marginTop: "10px" }}>
-                                                <Button variant="contained" color="error" sx={{ marginLeft: '10px', marginTop: "10px" }} startIcon={<DeleteIcon />} onClick={e => { deleteGoal() }}>
+                                            <Button variant="contained" color="error" sx={{ marginLeft: '10px', marginTop: "10px" }} startIcon={<DeleteIcon />} onClick={e => { setDeleteDialog(true) }}>
                                                     Delete Goal
                                                 </Button>
                                             </Box>
