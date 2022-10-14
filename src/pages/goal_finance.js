@@ -161,7 +161,7 @@ const Finance = () => {
 
     useEffect(() => {
         readData()
-
+        
     }, [updateData()])
 
     useEffect(() => {
